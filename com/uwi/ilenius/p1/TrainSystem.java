@@ -3,6 +3,7 @@ package com.uwi.ilenius.p1;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class TrainSystem {
     private SystemStatus status;
     private Map<String, Station> stations;
@@ -19,108 +20,169 @@ public class TrainSystem {
     }
 
     public void addStation(String sname) {
-        // Implement logic to add a station
+        if (!stations.containsKey(sname)) {
+            stations.put(sname, new Station(sname));
+        }
     }
 
     public void removeStation(String sname) {
-        // Implement logic to remove a station
+        stations.remove(sname);
     }
 
     public void openStation(String sname) {
-        // Implement logic to open a station
+        Station station = stations.get(sname);
+        if (station != null) {
+            station.open();
+        }
     }
 
     public void closeStation(String sname) {
-        // Implement logic to close a station
+        Station station = stations.get(sname);
+        if (station != null) {
+            station.close();
+        }
     }
 
     public void addSegment(String sname, String start, String sEnd) {
-        // Implement logic to add a segment
+        if (!segments.containsKey(sname)) {
+            Station startStation = stations.get(start);
+            Station endStation = stations.get(sEnd);
+            if (startStation != null && endStation != null) {
+                segments.put(sname, new Segment(sname, startStation, endStation));
+            }
+        }
     }
 
     public void removeSegment(String sname) {
-        // Implement logic to remove a segment
+        segments.remove(sname);
     }
 
     public void openSegment(String sname) {
-        // Implement logic to open a segment
+        Segment segment = segments.get(sname);
+        if (segment != null) {
+            segment.open();
+        }
     }
 
     public void closeSegment(String sname) {
-        // Implement logic to close a segment
+        Segment segment = segments.get(sname);
+        if (segment != null) {
+            segment.close();
+        }
     }
 
     public void addRoute(String rName, boolean isRoundTrip, OrderedSet<Station> rStations) {
-        // Implement logic to add a route
+        if (!routes.containsKey(rName)) {
+            Route route = new Route(rName, isRoundTrip, rStations);
+            routes.put(rName, route);
+        }
     }
 
-    public void removeRoute(String sname) {
-        // Implement logic to remove a route
+    public void removeRoute(String rName) {
+        routes.remove(rName);
     }
 
-    public void openRoute(String sname) {
-        // Implement logic to open a route
+    public void openRoute(String rName) {
+        Route route = routes.get(rName);
+        if (route != null) {
+            route.open();
+        }
     }
 
-    public void closeRoute(String sname) {
-        // Implement logic to close a route
+    public void closeRoute(String rName) {
+        Route route = routes.get(rName);
+        if (route != null) {
+            route.close();
+        }
     }
 
-    public void addTrain() {
-        // Implement logic to add a train
+    public void addTrain(Train train) {
+        trains.put(train.getId(), train);
     }
 
     public void removeTrain(Integer id) {
-        // Implement logic to remove a train
+        trains.remove(id);
     }
 
-    public void registerTrain(Integer trainId, String routeName) {
-        // Implement logic to register a train to a route
+    public void registerTrain(Integer trainId, String routeName, int startTime) {
+        Train train = trains.get(trainId);
+        Route route = routes.get(routeName);
+        if (train != null && route != null) {
+            train.register( startTime);
+        }
     }
 
     public void deRegisterTrain(Integer trainId) {
-        // Implement logic to deregister a train from its route
+        Train train = trains.get(trainId);
+        if (train != null) {
+            train.deRegisterJourney();
+        }
     }
 
     public boolean containsStation(String station) {
-        // Implement logic to check if a station exists
-        return false;
+        return stations.containsKey(station);
     }
-
+    
     public boolean containsSegment(String segment) {
-        // Implement logic to check if a segment exists
-        return false;
+        return segments.containsKey(segment);
     }
-
+    
     public boolean containsRoute(String route) {
-        // Implement logic to check if a route exists
-        return false;
+        return routes.containsKey(route);
     }
-
-    public boolean containsTrain(Integer train) {
-        // Implement logic to check if a train exists
-        return false;
+    
+    public boolean containsTrain(Integer trainId) {
+        return trains.containsKey(trainId);
     }
-
+    
     public String getStationInfo(String station) {
-        // Implement logic to get information about a station
+        Station s = stations.get(station);
+        if (s != null) {
+            return "Station Name: " + s.getName() + "\n" +
+                   "Status: " + s.getStatus().toString() + "\n";
+        }
         return null;
     }
-
-    public String getSegmentInfo(String segment) {
-        // Implement logic to get information about a segment
+    
+    public String getSegmentInfo(String segmentName) {
+        Segment s = segments.get(segmentName);
+        if (s != null) {
+            return "Segment Name: " + s.getName() + "\n" +
+                   "Status: " + s.getStatus().toString() + "\n" +
+                   "Start Station: " + s.getStart().getName() + "\n" +
+                   "End Station: " + s.getEnd().getName() + "\n";
+        }
         return null;
     }
-
-    public String getRouteInfo(String route) {
-        // Implement logic to get information about a route
+    
+    public String getRouteInfo(String routeName) {
+        Route r = routes.get(routeName);
+        if (r != null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Route Name: ").append(r.getName()).append("\n");
+            sb.append("Is Round Trip: ").append(r.isRoundTrip()).append("\n");
+            sb.append("Status: ").append(r.getStatus().toString()).append("\n");
+            sb.append("Segments:\n");
+            for (Segment segment : r.getSegments()) {
+                sb.append("- ").append(segment.getName()).append("\n");
+            }
+            return sb.toString();
+        }
         return null;
     }
-
-    public String getTrainInfo(Integer train) {
-        // Implement logic to get information about a train
+    
+    public String getTrainInfo(Integer trainId) {
+        Train t = trains.get(trainId);
+        if (t != null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Train ID: ").append(t.getId()).append("\n");
+            sb.append("Current Location: ").append(t.getCurrentLocation() != null ? t.getCurrentLocation().getName() : "Unknown").append("\n");
+            sb.append("Route: ").append(t.getRoute() != null ? t.getRoute().getName() : "None").append("\n");
+            return sb.toString();
+        }
         return null;
     }
+    
 
     public void setToWorking() {
         status = SystemStatus.Initialised;

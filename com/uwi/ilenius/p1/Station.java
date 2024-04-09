@@ -5,8 +5,10 @@ public class Station {
     private RSStatus status;
     private boolean hasTrain;
     private boolean isOpen;
+    private Train trainStation;
+    private TrainSystem trainSystem;
 
-    public Station(String name, RSStatus status) {
+    public Station(String name) {
         this.name = name;
         this.status = status;
         this.hasTrain = false;
@@ -22,17 +24,18 @@ public class Station {
     }
 
     public boolean verify() {
-        // Implement logic to verify the station
-        return false;
+        return name != null && !name.trim().isEmpty();
     }
+    
 
     public void close() {
         isOpen = false;
-        // Implement logic to close the station
+        // status = RSStatus.ClosedForMaintenance;
     }
 
     public void open() {
         isOpen = true;
+        status = RSStatus.Open;
         // Implement logic to open the station
     }
 
@@ -52,6 +55,12 @@ public class Station {
         } else {
             System.out.println("No train to release.");
         }
+    }
+
+    // get name method
+    
+    public String getName() {
+        return name;
     }
 }
 

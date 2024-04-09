@@ -3,17 +3,21 @@ package com.uwi.ilenius.p1;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class Route {
     private String name;
     private boolean isRoundTrip;
     private RSStatus status;
     private Map<String, Segment> segments;
+    private TrainSystem trainSystem;
+    private Map<String, Train> trains;
 
-    public Route(String name, boolean isRoundTrip, RSStatus status) {
+    public Route(String name, boolean isRoundTrip, RSStatus status, TrainSystem trainSystem, Map<String, Segment> segments, Map<String, Train> trains) {
         this.name = name;
         this.isRoundTrip = isRoundTrip;
         this.status = status;
         this.segments = new HashMap<>();
+        this.trains = new HashMap<>();
     }
 
     public boolean isRoundTrip() {
@@ -22,14 +26,14 @@ public class Route {
 
     public Station getStart() {
         if (!segments.isEmpty()) {
-            return segments.get(segments.keySet().iterator().next()).getStart();
+            return segments.get(segments.keySet().iterator().next()).getSegmentStart();
         }
         return null;
     }
 
     public Station getEnd() {
         if (!segments.isEmpty()) {
-            return segments.get(segments.keySet().iterator().next()).getEnd();
+            return segments.get(segments.keySet().iterator().next()).getSegmentEnd();
         }
         return null;
     }
@@ -83,46 +87,3 @@ public class Route {
     }
 }
 
-class Segment {
-    private String name;
-    private Station start;
-    private Station end;
-
-    public Segment(String name, Station start, Station end) {
-        this.name = name;
-        this.start = start;
-        this.end = end;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Station getStart() {
-        return start;
-    }
-
-    public Station getEnd() {
-        return end;
-    }
-}
-
-class Station {
-    private String name;
-
-    public Station(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-}
-
-class RSStatus {
-    // Define RSStatus properties and methods
-}
-
-class OrderedSet<T> {
-    // Define OrderedSet properties and methods
-}

@@ -5,6 +5,8 @@ public class Train {
     private Integer timeRegistered;
     private Integer startTime;
     private Station currentLocation;
+    private Route route;
+    private TrainSystem trainSystem;
 
     public Train(Integer id) {
         this.id = id;
@@ -13,6 +15,23 @@ public class Train {
         this.currentLocation = null;
     }
 
+    //get id method
+
+    public Integer getId() {
+        return id;
+    }
+
+    //get route method
+
+    public Route getRoute() {
+        return route;
+    }
+
+    //get location method
+
+    public Station getCurrentLocation() {
+        return currentLocation;
+    }
     public boolean isRegistered() {
         return timeRegistered != -1;
     }
@@ -63,7 +82,7 @@ public class Train {
     }
 
     public boolean verify() {
-        // Implement logic to verify the train
-        return false;
+        return route != null && route.verify() && timeRegistered > 0;
     }
+    
 }
