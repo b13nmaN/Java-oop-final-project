@@ -1,168 +1,188 @@
 package com.uwi.ilenius.p1;
+import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.HashSet;
+import java.util.Set;
 
-import java.util.HashMap;
-import java.util.Map;
-
-
-public class TrainSystem {
+public class TrainSystem implements Verifiable {
     private SystemStatus status;
-    private Map<String, Station> stations;
-    private Map<String, Segment> segments;
-    private Map<String, Route> routes;
-    private Map<Integer, Train> trains;
+    private LinkedList<Station> stations;
+    private LinkedList<Segment> segments;
+    private LinkedList<Route> routes;
+    private LinkedList<Train> trains;
 
     public TrainSystem() {
         this.status = SystemStatus.Initialised;
-        this.stations = new HashMap<>();
-        this.segments = new HashMap<>();
-        this.routes = new HashMap<>();
-        this.trains = new HashMap<>();
+        this.stations = new LinkedList<>();
+        this.segments = new LinkedList<>();
+        this.routes = new LinkedList<>();
+        this.trains = new LinkedList<>();
     }
 
     public void addStation(String sname) {
-        if (!stations.containsKey(sname)) {
-            stations.put(sname, new Station(sname));
+        if (!containsStation(sname)) {
+            stations.add(new Station(sname));
         }
     }
 
     public void removeStation(String sname) {
-        stations.remove(sname);
+        stations.remove(new Station(sname));
     }
 
     public void openStation(String sname) {
-        Station station = stations.get(sname);
+        Station station = getStationByName(sname);
         if (station != null) {
             station.open();
         }
     }
 
     public void closeStation(String sname) {
-        Station station = stations.get(sname);
+        Station station = getStationByName(sname);
         if (station != null) {
             station.close();
         }
     }
 
     public void addSegment(String sname, String start, String sEnd) {
-        if (!segments.containsKey(sname)) {
-            Station startStation = stations.get(start);
-            Station endStation = stations.get(sEnd);
+        if (!containsSegment(sname)) {
+            Station startStation = getStationByName(start);
+            Station endStation = getStationByName(sEnd);
             if (startStation != null && endStation != null) {
-                segments.put(sname, new Segment(sname, startStation, endStation));
+                segments.add(new Segment(sname, startStation, endStation));
             }
         }
     }
 
     public void removeSegment(String sname) {
-        segments.remove(sname);
+        // iterate through segments List and remove if found
+        for (Iterator<Segment> iterator = segments.iterator(); iterator.hasNext();) {
+            Segment segment = iterator.next();
+            if (segment.getName().equals(sname)) {
+                iterator.remove();
+                break;
+            }
+        }
     }
 
     public void openSegment(String sname) {
-        Segment segment = segments.get(sname);
+        Segment segment = getSegmentByName(sname);
         if (segment != null) {
             segment.open();
         }
     }
 
     public void closeSegment(String sname) {
-        Segment segment = segments.get(sname);
+        Segment segment = getSegmentByName(sname);
         if (segment != null) {
             segment.close();
         }
     }
 
-    public void addRoute(String rName, boolean isRoundTrip, OrderedSet<Station> rStations) {
-        if (!routes.containsKey(rName)) {
-            Route route = new Route(rName, isRoundTrip, rStations);
-            routes.put(rName, route);
+    public void addRoute(String rName, boolean isRoundTrip, RSStatus status) {
+        if (!containsRoute(rName)) {
+            routes.add(new Route(rName, isRoundTrip, status));
         }
     }
 
     public void removeRoute(String rName) {
-        routes.remove(rName);
+        // iterate through routes List and remove if found
+        for (Iterator<Route> iterator = routes.iterator(); iterator.hasNext();) {
+            Route route = iterator.next();
+            if (route.getName().equals(rName)) {
+                iterator.remove();
+                break;
+            }
+        }
     }
 
     public void openRoute(String rName) {
-        Route route = routes.get(rName);
+        Route route = getRouteByName(rName);
         if (route != null) {
             route.open();
         }
     }
 
     public void closeRoute(String rName) {
-        Route route = routes.get(rName);
+        Route route = getRouteByName(rName);
         if (route != null) {
             route.close();
         }
     }
 
     public void addTrain(Train train) {
-        trains.put(train.getId(), train);
+        trains.add(train);
     }
 
     public void removeTrain(Integer id) {
-        trains.remove(id);
+        // iterate through trains List and remove if found
+        for (Iterator<Train> iterator = trains.iterator(); iterator.hasNext();) {
+            Train train = iterator.next();
+            if (train.getId().equals(id)) {
+                iterator.remove();
+                break;
+            }
+        }
     }
 
     public void registerTrain(Integer trainId, String routeName, int startTime) {
-        Train train = trains.get(trainId);
-        Route route = routes.get(routeName);
+        Train train = getTrainById(trainId);
+        Route route = getRouteByName(routeName);
         if (train != null && route != null) {
-            train.register( startTime);
+            train.register(startTime);
         }
     }
 
     public void deRegisterTrain(Integer trainId) {
-        Train train = trains.get(trainId);
-        if (train != null) {
-            train.deRegisterJourney();
-        }
+        trains.remove(getTrainById(trainId));
+        removeTrain(trainId);   
     }
 
     public boolean containsStation(String station) {
-        return stations.containsKey(station);
+        return getStationByName(station) != null;
     }
-    
+
     public boolean containsSegment(String segment) {
-        return segments.containsKey(segment);
+        return getSegmentByName(segment) != null;
     }
-    
+
     public boolean containsRoute(String route) {
-        return routes.containsKey(route);
+        return getRouteByName(route) != null;
     }
-    
+
     public boolean containsTrain(Integer trainId) {
-        return trains.containsKey(trainId);
+        return getTrainById(trainId) != null;
     }
-    
+
     public String getStationInfo(String station) {
-        Station s = stations.get(station);
+        Station s = getStationByName(station);
         if (s != null) {
             return "Station Name: " + s.getName() + "\n" +
-                   "Status: " + s.getStatus().toString() + "\n";
+                    "Status: " + s.getStatus().toString() + "\n";
         }
         return null;
     }
-    
+
     public String getSegmentInfo(String segmentName) {
-        Segment s = segments.get(segmentName);
+        Segment s = getSegmentByName(segmentName);
         if (s != null) {
             return "Segment Name: " + s.getName() + "\n" +
-                   "Status: " + s.getStatus().toString() + "\n" +
-                   "Start Station: " + s.getStart().getName() + "\n" +
-                   "End Station: " + s.getEnd().getName() + "\n";
+                    "Status: " + s.getStatus().toString() + "\n" +
+                    "Start Station: " + s.getSegmentStart().getName() + "\n" +
+                    "End Station: " + s.getSegmentEnd().getName() + "\n";
         }
         return null;
     }
-    
+
     public String getRouteInfo(String routeName) {
-        Route r = routes.get(routeName);
+        Route r = getRouteByName(routeName);
         if (r != null) {
             StringBuilder sb = new StringBuilder();
             sb.append("Route Name: ").append(r.getName()).append("\n");
             sb.append("Is Round Trip: ").append(r.isRoundTrip()).append("\n");
             sb.append("Status: ").append(r.getStatus().toString()).append("\n");
             sb.append("Segments:\n");
+
+            // Iterate through the segments using entrySet() to access both key and value
             for (Segment segment : r.getSegments()) {
                 sb.append("- ").append(segment.getName()).append("\n");
             }
@@ -170,9 +190,10 @@ public class TrainSystem {
         }
         return null;
     }
-    
+
+
     public String getTrainInfo(Integer trainId) {
-        Train t = trains.get(trainId);
+        Train t = getTrainById(trainId);
         if (t != null) {
             StringBuilder sb = new StringBuilder();
             sb.append("Train ID: ").append(t.getId()).append("\n");
@@ -182,7 +203,7 @@ public class TrainSystem {
         }
         return null;
     }
-    
+
 
     public void setToWorking() {
         status = SystemStatus.Initialised;
@@ -201,11 +222,80 @@ public class TrainSystem {
     }
 
     public boolean verify() {
-        // Implement logic to verify the train system
-        return false;
+        // A. Verify each object in stations
+        Set<String> stationNames = new HashSet<>();
+        for (Station station : stations) {
+            if (!station.verify() || !stationNames.add(station.getName())) {
+                return false; // Verification failed or duplicate station found
+            }
+        }
+    
+        // B. Verify each object in segments
+        Set<String> segmentNames = new HashSet<>();
+        for (Segment segment : segments) {
+            if (!segment.verify() || !segmentNames.add(segment.getName())) {
+                return false; // Verification failed or duplicate segment found
+            }
+        }
+    
+        // C. Verify each object in routes
+        Set<String> routeNames = new HashSet<>();
+        for (Route route : routes) {
+            if (!route.verify() || !routeNames.add(route.getName())) {
+                return false; // Verification failed or duplicate route found
+            }
+        }
+    
+        // D. Verify each object in trains
+        Set<Integer> trainIds = new HashSet<>();
+        for (Train train : trains) {
+            if (!train.verify() || !trainIds.add(train.getId())) {
+                return false; // Verification failed or duplicate train found
+            }
+        }
+    
+        // All objects verified and no duplicates found
+        return true;
     }
+    
 
     public void advance() {
         // Implement logic to advance the train system
+    }
+
+    private Station getStationByName(String name) {
+        for (Station station : stations) {
+            if (station.getName().equals(name)) {
+                return station;
+            }
+        }
+        return null;
+    }
+
+    private Segment getSegmentByName(String name) {
+        for (Segment segment : segments) {
+            if (segment.getName().equals(name)) {
+                return segment;
+            }
+        }
+        return null;
+    }
+
+    private Route getRouteByName(String name) {
+        for (Route route : routes) {
+            if (route.getName().equals(name)) {
+                return route;
+            }
+        }
+        return null;
+    }
+
+    private Train getTrainById(Integer id) {
+        for (Train train : trains) {
+            if (train.getId().equals(id)) {
+                return train;
+            }
+        }
+        return null;
     }
 }

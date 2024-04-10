@@ -6,12 +6,13 @@ public enum RSStatus {
     ;
 
     private String description;
-    RSStatus(String description) 
-    {
-    this.description = description;
+    
+    RSStatus (String description) {
+    
+        this.description = description;
     }
     public String getDescription() 
     {
-    return description;
+        return description;
     }
 }

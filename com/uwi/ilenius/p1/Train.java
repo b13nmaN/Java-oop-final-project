@@ -1,6 +1,6 @@
 package com.uwi.ilenius.p1;
 
-public class Train {
+public class Train implements Verifiable{
     private Integer id;
     private Integer timeRegistered;
     private Integer startTime;

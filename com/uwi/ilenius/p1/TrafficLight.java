@@ -2,7 +2,7 @@ package com.uwi.ilenius.p1;
 import com.uwi.ilenius.p1.Light;
 
 
-public class TrafficLight {
+public class TrafficLight implements Verifiable{
     private Integer id;
     private Light colour;
     private Segment segment;

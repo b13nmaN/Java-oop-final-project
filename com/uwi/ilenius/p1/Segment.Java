@@ -1,7 +1,7 @@
 package com.uwi.ilenius.p1;
 import java.util.List;
 
-public class Segment implements Comparable<Segment> {
+public class Segment implements Verifiable, Openable, Closeable{
     private String name;
     private RSStatus status;
     private boolean hasTrain;
@@ -120,9 +120,5 @@ public class Segment implements Comparable<Segment> {
         // Implement logic to open the segment
     }
 
-    @Override
-    public int compareTo(Segment otherSegment) {
-        return this.name.compareTo(otherSegment.name);
-    }
 }
 
