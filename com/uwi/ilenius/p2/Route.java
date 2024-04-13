@@ -1,9 +1,14 @@
-package com.uwi.ilenius.p1;
+package com.uwi.ilenius.p2;
 
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.uwi.ilenius.p2.enums.RSStatus;
+import com.uwi.ilenius.p2.interfaces.Closeable;
+import com.uwi.ilenius.p2.interfaces.Openable;
+import com.uwi.ilenius.p2.interfaces.Verifiable;
 
 
 public class Route implements Verifiable, Openable, Closeable {
@@ -88,7 +93,14 @@ public class Route implements Verifiable, Openable, Closeable {
 
     public boolean canGetTo(String station) {
         // Implement logic to check if it's possible to get to the station
-        // Not implemented for this example
+        ListIterator<Segment> iterator = segments.listIterator();
+        Segment currentSegment = null;
+        while (iterator.hasNext()) {
+            currentSegment = iterator.next();
+            if (currentSegment.getSegmentStart().getName().equals(station)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -126,10 +138,6 @@ public class Route implements Verifiable, Openable, Closeable {
         return segments.contains(segment);
     }
 
-    public void changeLight(String startOfSegment) {
-        // Implement logic to change the light
-        // Not implemented for this example
-    }
 
     public boolean verify() {
         // A. Check if the name is valid (not null or empty)

@@ -1,8 +1,12 @@
-package com.uwi.ilenius.p1;
+package com.uwi.ilenius.p2;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.uwi.ilenius.p2.enums.RSStatus;
+import com.uwi.ilenius.p2.enums.SystemStatus;
+import com.uwi.ilenius.p2.interfaces.Verifiable;
 
 public class TrainSystem implements Verifiable {
     private SystemStatus status;
@@ -209,9 +213,6 @@ public class TrainSystem implements Verifiable {
         status = SystemStatus.Initialised;
     }
 
-    public void setPaused() {
-        status = SystemStatus.Deadlocked;
-    }
 
     public void setStopped() {
         status = SystemStatus.Finished;
