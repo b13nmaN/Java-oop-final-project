@@ -2,10 +2,14 @@ package com.uwi.ilenius.p2.models;
 import java.util.List;
 
 import com.uwi.ilenius.p2.enums.RSStatus;
+import com.uwi.ilenius.p2.events.CFOSEvent;
 import com.uwi.ilenius.p2.events.LightEvent;
 import com.uwi.ilenius.p2.interfaces.Closeable;
 import com.uwi.ilenius.p2.interfaces.Openable;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
+// import com.uwi.ilenius.p2.enums.ObjectType;
+import com.uwi.ilenius.p2.enums.Action;
+import com.uwi.ilenius.p2.enums.Light;
 
 public class Segment implements Verifiable, Openable, Closeable{
     private String name;
@@ -15,13 +19,13 @@ public class Segment implements Verifiable, Openable, Closeable{
     private TrafficLight trafficLight;
     private Station segmentStart;
     private Station segmentEnd;
-    private List<Train> trainsForRoute;
+    // private List<Train> trainsForRoute;
     private TrainSystem trainSystem;
+    // private ObjectType type = ObjectType.Segment_;
 
     // the segment class has a compostion relationship with the TrafficLight class
     public Segment(String name, Station segmentStart, Station segmentEnd) {
         this.name = name;
-        this.status = status;
         this.hasTrain = false;
         this.isOpen = true;
         this.segmentStart = segmentStart;
@@ -63,28 +67,55 @@ public class Segment implements Verifiable, Openable, Closeable{
         return isOpen;
     }
 
-    public void acceptTrain(Train train) {
+    public CFOSEvent acceptTrain(Train train, int time) {
         if (!hasTrain && isOpen) {
             hasTrain = true;
-            // Logic to handle train acceptance
+            return new CFOSEvent("Segment", time, Action.OPEN);
         } else {
             System.out.println("Cannot accept train. Segment is occupied or closed.");
+            return null;
         }
     }
 
-    public void releaseTrain() {
+    public CFOSEvent releaseTrain(int time) {
         if (hasTrain) {
             hasTrain = false;
-            // Logic to handle train release
+            return new CFOSEvent("Segment", time, Action.CLOSE);
         } else {
             System.out.println("No train to release.");
+            return null;
         }
     }
 
-    // public LightEvent changeLight() {
-    //     // Implement logic to change the light
+    public LightEvent changeLight() {
+        // Implement logic to change the light
+        switch (trafficLight.getColour()) {
+            case Red:
+                trafficLight.change();
+                return new LightEvent("Segment", trainSystem.getCurrentTime(), Light.Red, Light.Green);
+            case Green:
+                trafficLight.change();
+                return new LightEvent("Segment", trainSystem.getCurrentTime(), Light.Green, Light.Red);
+            default:
+                System.out.println("Invalid colour " + trafficLight.getColour());
+                return null;
+        }
         
-    // }
+    }
+
+    public CFOSEvent close() {
+        isOpen = false;
+        int time = trainSystem.getCurrentTime();
+        return new CFOSEvent("Segment", time, Action.CLOSE);
+    }
+
+    public CFOSEvent open() {
+        isOpen = true;
+
+        int time = trainSystem.getCurrentTime();
+        
+        return new CFOSEvent("Segment", time, Action.OPEN);
+    }
 
     public boolean verify() {
         if (name == null || name.trim().isEmpty()) {
@@ -108,20 +139,6 @@ public class Segment implements Verifiable, Openable, Closeable{
         }
     
         return true;
-    }
-    
-
-    public void close() {
-        isOpen = false;
-        // Implement logic to close the segment
-        
-    }
-
-    public RSStatus open() {
-        isOpen = true;
-        RSStatus status = RSStatus.Open;
-        return status;
-        // Implement logic to open the segment
     }
 
 }

@@ -4,7 +4,7 @@ import java.util.ListIterator;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.uwi.ilenius.p2.enums.RSStatus;
+// import com.uwi.ilenius.p2.enums.RSStatus;
 import com.uwi.ilenius.p2.enums.SystemStatus;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
 
@@ -23,6 +23,7 @@ public class TrainSystem implements Verifiable {
         this.routes = new LinkedList<>();
         this.trains = new LinkedList<>();
     }
+
 
     public void addStation(String sname) {
         if (!containsStation(sname)) {
@@ -83,9 +84,9 @@ public class TrainSystem implements Verifiable {
         }
     }
 
-    public void addRoute(String rName, boolean isRoundTrip, RSStatus status) {
+    public void addRoute(String rName, boolean isRoundTrip, LinkedList<Station> stations) {
         if (!containsRoute(rName)) {
-            routes.add(new Route(rName, isRoundTrip, status));
+            routes.add(new Route(rName, isRoundTrip, stations));
         }
     }
 
@@ -149,6 +150,16 @@ public class TrainSystem implements Verifiable {
         Train train = getTrainByName(tname);
         train.deregister();
         removeTrain(tname);   
+    }
+
+
+    
+    public int getCurrentTime() {
+        return simulator.getCurrentTime();
+    }
+
+    public void setCurrentTime(int currentTime) {
+        simulator.setCurrentTime(currentTime);
     }
 
     public boolean containsStation(String station) {
@@ -308,5 +319,17 @@ public class TrainSystem implements Verifiable {
             }
         }
         return null;
+    }
+
+    public LinkedList<Train> getTrains() {
+        return trains;
+    }
+
+    public LinkedList<Station> getStations() {
+        return stations;
+    }
+
+    public LinkedList<Segment> getSegments() {
+        return segments;
     }
 }

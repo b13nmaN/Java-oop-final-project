@@ -1,6 +1,7 @@
 package com.uwi.ilenius.p2.models;
 
 import com.uwi.ilenius.p2.enums.RSStatus;
+import com.uwi.ilenius.p2.events.CFOSEvent;
 import com.uwi.ilenius.p2.interfaces.Closeable;
 import com.uwi.ilenius.p2.interfaces.Openable;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
@@ -38,15 +39,15 @@ public class Station implements Verifiable, Openable, Closeable{
     }
     
 
-    public void close() {
+    public CFOSEvent close() {
         isOpen = false;
+        return new CFOSEvent("Station", 0, null);
         // status = RSStatus.ClosedForMaintenance;
     }
 
-    public RSStatus open() {
+    public CFOSEvent open() {
         isOpen = true;
-        status = RSStatus.Open;
-        return status;
+        return new CFOSEvent("Station", 0, null);
         // Implement logic to open the station
     }
 
