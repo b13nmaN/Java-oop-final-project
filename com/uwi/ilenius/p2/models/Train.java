@@ -1,4 +1,4 @@
-package com.uwi.ilenius.p2;
+package com.uwi.ilenius.p2.models;
 
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -58,6 +58,12 @@ public class Train implements Verifiable {
         return waitTimeRemaining;
     }
 
+    //Setters
+    public void setTimeRegistered(Integer timeRegistered) {
+        this.timeRegistered = timeRegistered;
+    }
+
+
     public boolean isRegistered() {
         return timeRegistered != -1;
     }
@@ -86,6 +92,7 @@ public class Train implements Verifiable {
         this.isAtStart = true;
         this.waitTimeRemaining = 0;
         this.stops.clear();
+        route = null;
     }
 
     // Check if the train is waiting
@@ -93,19 +100,19 @@ public class Train implements Verifiable {
         return waitTimeRemaining > 0;
     }
 
-    public CFOSEvent start() {
-        if (!isRegistered())
-            throw new IllegalStateException("Train must be registered before starting.");
+    // public CFOSEvent start() {
+    //     if (!isRegistered())
+    //         throw new IllegalStateException("Train must be registered before starting.");
     
-        if (startTime == -1) {
-            startTime = timeRegistered;
-            CFOSEvent event = new CFOSEvent(currentLocation.getName(), startTime, Action.START);
-            advance(startTime); // Move the train to the next station
-            return event;
-        } else {
-            throw new IllegalStateException("Train is already started.");
-        }
-    }
+    //     if (startTime == -1) {
+    //         startTime = timeRegistered;
+    //         CFOSEvent event = new CFOSEvent(currentLocation.getName(), startTime, Action.START);
+    //         advance(startTime); // Move the train to the next station
+    //         return event;
+    //     } else {
+    //         throw new IllegalStateException("Train is already started.");
+    //     }
+    // }
     
 
     // Method to finish the train
@@ -121,52 +128,15 @@ public class Train implements Verifiable {
 
 
     // Advance the train by the given time// Method to advance the train
-    public MoveEvent advance(int time) {
-        if (currentLocation == route.getEnd() && !isAtStart)
-            throw new IllegalStateException("Train has already finished.");
-        
-        if (currentLocation.isOpen() && !currentLocation.verify())
-            throw new IllegalStateException("Current station is not valid.");
-        
-        String nextStation = nextStation();
-        
-        if (!currentLocation.isOpen() || !currentLocation.canGetTo(nextStation))
-            throw new IllegalStateException("Cannot advance to next station.");
-        
-        int travelTime = 1;
-        if (currentLocation.hasStop(nextStation))
-            travelTime++; // Add one more time unit if there's a stop at the next station
-        
-        // Update current location
-        currentLocation = statio;
-        
-        // Update wait time if the train needs to stop
-        if (currentLocation.hasStop(nextStation))
-            waitTimeRemaining = 1;
-        else
-            waitTimeRemaining = 0;
-        
-        // Update isAtStart based on the current location
-        isAtStart = !isAtStart;
-        
-        return new MoveEvent(currentLocation.getName(), nextStation);
-    }
-
-
-    // Get the name of the current station
-    public String currentStation() {
-        if (currentLocation != null) {
-            return currentLocation.getName();
-        }
-        return null;
-    }
+    // public MoveEvent advance(int time) {
+    // }
 
     // Get the name of the next station
     // Method to get the next station of the train
-    public String nextStation() {
-        String currentStationName = currentLocation.getName();
-        return isAtStart ? route.getNextStation(currentStationName, true).getName() : route.getPreviousStation(currentStationName, false).getName();
-    }
+    // public String nextStation() {
+    //     String currentStationName = currentLocation.getName();
+    //     return isAtStart ? route.getNextStation(currentStationName, true).getName() : route.getPreviousStation(currentStationName, false).getName();
+    // }
 
     // Add a stop to the train route
     public void addStop(String stop) {

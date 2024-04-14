@@ -1,4 +1,4 @@
-package com.uwi.ilenius.p2;
+package com.uwi.ilenius.p2.models;
 import java.util.List;
 
 import com.uwi.ilenius.p2.enums.RSStatus;
@@ -81,10 +81,10 @@ public class Segment implements Verifiable, Openable, Closeable{
         }
     }
 
-    public LightEvent changeLight() {
-        // Implement logic to change the light
+    // public LightEvent changeLight() {
+    //     // Implement logic to change the light
         
-    }
+    // }
 
     public boolean verify() {
         if (name == null || name.trim().isEmpty()) {
@@ -117,8 +117,10 @@ public class Segment implements Verifiable, Openable, Closeable{
         
     }
 
-    public void open() {
+    public RSStatus open() {
         isOpen = true;
+        RSStatus status = RSStatus.Open;
+        return status;
         // Implement logic to open the segment
     }
 

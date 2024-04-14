@@ -1,4 +1,4 @@
-package com.uwi.ilenius.p2;
+package com.uwi.ilenius.p2.models;
 
 import com.uwi.ilenius.p2.enums.RSStatus;
 import com.uwi.ilenius.p2.interfaces.Closeable;
@@ -43,9 +43,10 @@ public class Station implements Verifiable, Openable, Closeable{
         // status = RSStatus.ClosedForMaintenance;
     }
 
-    public void open() {
+    public RSStatus open() {
         isOpen = true;
         status = RSStatus.Open;
+        return status;
         // Implement logic to open the station
     }
 

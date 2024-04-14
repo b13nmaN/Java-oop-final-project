@@ -1,4 +1,4 @@
-package com.uwi.ilenius.p2;
+package com.uwi.ilenius.p2.models;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.HashSet;
@@ -14,6 +14,7 @@ public class TrainSystem implements Verifiable {
     private LinkedList<Segment> segments;
     private LinkedList<Route> routes;
     private LinkedList<Train> trains;
+    private Simulator simulator;
 
     public TrainSystem() {
         this.status = SystemStatus.Initialised;
@@ -113,32 +114,41 @@ public class TrainSystem implements Verifiable {
         }
     }
 
-    public void addTrain(Train train) {
+    public void addTrain(String tname) {
+        int nextId = 1;
+        while (containsTrain(tname)) {
+            nextId = (int) (Math.random() * Integer.MAX_VALUE);
+        }
+        Train train = new Train(nextId, tname);
         trains.add(train);
     }
 
-    public void removeTrain(Integer id) {
+    public void removeTrain(String tname) {
         // iterate through trains List and remove if found
         for (ListIterator<Train> iterator = trains.listIterator(); iterator.hasNext();) {
             Train train = iterator.next();
-            if (train.getId().equals(id)) {
+            if (train.getName().equals(tname)) {
                 iterator.remove();
                 break;
             }
         }
     }
 
-    public void registerTrain(Integer trainId, String routeName, int startTime) {
-        Train train = getTrainById(trainId);
-        Route route = getRouteByName(routeName);
-        if (train != null && route != null) {
-            train.register(startTime);
+    public void registerTrain(String tname, String rName) {
+        for (ListIterator<Train> iterator = trains.listIterator(); iterator.hasNext();) {
+            Train train = iterator.next();
+            if (train.getName().equals(tname)) {
+                train.changeRoute(getRouteByName(rName));
+                train.setTimeRegistered(simulator.getCurrentTime()); // get the current time of the simulation
+                break;
+            }
         }
     }
 
-    public void deRegisterTrain(Integer trainId) {
-        trains.remove(getTrainById(trainId));
-        removeTrain(trainId);   
+    public void deRegisterTrain(String tname) {
+        Train train = getTrainByName(tname);
+        train.deregister();
+        removeTrain(tname);   
     }
 
     public boolean containsStation(String station) {
@@ -153,8 +163,8 @@ public class TrainSystem implements Verifiable {
         return getRouteByName(route) != null;
     }
 
-    public boolean containsTrain(Integer trainId) {
-        return getTrainById(trainId) != null;
+    public boolean containsTrain(String tname) {
+        return getTrainByName(tname) != null;
     }
 
     public String getStationInfo(String station) {
@@ -196,8 +206,8 @@ public class TrainSystem implements Verifiable {
     }
 
 
-    public String getTrainInfo(Integer trainId) {
-        Train t = getTrainById(trainId);
+    public String getTrainInfo(String tname) {
+        Train t = getTrainByName(tname);
         if (t != null) {
             StringBuilder sb = new StringBuilder();
             sb.append("Train ID: ").append(t.getId()).append("\n");
@@ -291,9 +301,9 @@ public class TrainSystem implements Verifiable {
         return null;
     }
 
-    private Train getTrainById(Integer id) {
+    private Train getTrainByName(String tname) {
         for (Train train : trains) {
-            if (train.getId().equals(id)) {
+            if (train.getName().equals(tname)) {
                 return train;
             }
         }

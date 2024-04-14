@@ -1,4 +1,4 @@
-package com.uwi.ilenius.p2;
+package com.uwi.ilenius.p2.models;
 import com.uwi.ilenius.p1.Light;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
 

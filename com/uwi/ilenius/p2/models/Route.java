@@ -1,4 +1,4 @@
-package com.uwi.ilenius.p2;
+package com.uwi.ilenius.p2.models;
 
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -207,10 +207,9 @@ public class Route implements Verifiable, Openable, Closeable {
         }
     }
 
-    public void open() {
+    public RSStatus open() {
         // Implement logic to open the route
-        for (Segment segment : segments) {
-            segment.open();
-        }
+        status = RSStatus.Open;
+        return status;
     }
 }

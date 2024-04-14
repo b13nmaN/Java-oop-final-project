@@ -1,4 +1,4 @@
-package com.uwi.ilenius.p2;
+package com.uwi.ilenius.p2.models;
 
 import java.util.List;
 
@@ -13,6 +13,19 @@ public class Simulator extends Logable {
         this.currentTime = 0;
         this.status = SimulatorStatus.WORKING;
         this.trainSystem = trainSystem;
+    }
+
+
+    
+    // Get the current time of the simulation
+    public int getCurrentTime() {
+        return currentTime;
+    }
+
+    
+    // Set current time of the simulation
+    public void setCurrentTime(int currentTime) {
+        this.currentTime = currentTime;
     }
 
     // Check if the simulation is finished

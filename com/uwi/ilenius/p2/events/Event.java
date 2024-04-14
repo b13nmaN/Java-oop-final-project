@@ -1,6 +1,6 @@
 package com.uwi.ilenius.p2.events;
 
-public class Event {
+abstract public class Event {
     private String objectName;
     private int time;
 

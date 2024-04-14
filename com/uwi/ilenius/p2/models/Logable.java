@@ -1,4 +1,4 @@
-package com.uwi.ilenius.p2;
+package com.uwi.ilenius.p2.models;
 import java.util.*;
 
 import com.uwi.ilenius.p2.events.Event;
