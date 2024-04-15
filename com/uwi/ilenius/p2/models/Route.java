@@ -13,7 +13,7 @@ import com.uwi.ilenius.p2.interfaces.Openable;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
 
 
-public class Route implements Verifiable, Openable, Closeable {
+public class Route extends Logable implements Verifiable, Openable, Closeable {
     private String name;
     private boolean isRoundTrip;
     private RSStatus status = RSStatus.Open;

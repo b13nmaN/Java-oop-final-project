@@ -10,7 +10,7 @@ import com.uwi.ilenius.p2.events.CFOSEvent;
 import com.uwi.ilenius.p2.events.MoveEvent;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
 
-public class Train implements Verifiable {
+public class Train extends Logable implements Verifiable {
     private Integer id;
     private String name;
     private Integer timeRegistered;

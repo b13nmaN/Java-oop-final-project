@@ -11,17 +11,18 @@ import com.uwi.ilenius.p2.interfaces.Verifiable;
 import com.uwi.ilenius.p2.enums.Action;
 import com.uwi.ilenius.p2.enums.Light;
 
-public class Segment implements Verifiable, Openable, Closeable{
+public class Segment extends Logable implements Verifiable, Openable, Closeable{
     private String name;
     private RSStatus status = RSStatus.Open;
     private boolean hasTrain;
     private boolean isOpen;
-    private TrafficLight trafficLight;
+    private TrafficLight trafficLight = new TrafficLight(0, Light.Red);
     private Station segmentStart;
     private Station segmentEnd;
     // private List<Train> trainsForRoute;
     private TrainSystem trainSystem;
     // private ObjectType type = ObjectType.Segment_;
+    private int time;
 
     // the segment class has a compostion relationship with the TrafficLight class
     public Segment(String name, Station segmentStart, Station segmentEnd) {
@@ -30,6 +31,7 @@ public class Segment implements Verifiable, Openable, Closeable{
         this.isOpen = true;
         this.segmentStart = segmentStart;
         this.segmentEnd = segmentEnd;
+        this.time = 0;
     }
 
 
@@ -50,21 +52,16 @@ public class Segment implements Verifiable, Openable, Closeable{
         return segmentEnd;
     }
 
-    public void setSegmentStart(Station segmentStart) {
-        this.segmentStart = segmentStart;
-    }
-
-
-    public void setSegmentEnd(Station segmentEnd) {
-        this.segmentEnd = segmentEnd;
-    }
-
     public boolean hasTrain() {
         return hasTrain;
     }
 
     public boolean isOpen() {
         return isOpen;
+    }
+
+    public void setTime(int time) {
+        this.time = time;
     }
 
     public CFOSEvent acceptTrain(Train train, int time) {
@@ -94,10 +91,10 @@ public class Segment implements Verifiable, Openable, Closeable{
         switch (trafficLight.getColour()) {
             case Red:
                 trafficLight.change();
-                return new LightEvent("Segment", trainSystem.getCurrentTime(), Light.Red, Light.Green);
+                return new LightEvent("Segment", time, Light.Red, Light.Green);
             case Green:
                 trafficLight.change();
-                return new LightEvent("Segment", trainSystem.getCurrentTime(), Light.Green, Light.Red);
+                return new LightEvent("Segment", time, Light.Green, Light.Red);
             default:
                 System.out.println("Invalid colour " + trafficLight.getColour());
                 return null;
@@ -105,17 +102,18 @@ public class Segment implements Verifiable, Openable, Closeable{
         
     }
 
+    public boolean lightColour() {
+        // Implement logic to determine light color
+        return trafficLight.getColour() == Light.Green;
+    }
+
     public CFOSEvent close() {
         isOpen = false;
-        int time = trainSystem.getCurrentTime();
         return new CFOSEvent("Segment", time, Action.CLOSE);
     }
 
     public CFOSEvent open() {
         isOpen = true;
-
-        int time = trainSystem.getCurrentTime();
-        
         return new CFOSEvent("Segment", time, Action.OPEN);
     }
 

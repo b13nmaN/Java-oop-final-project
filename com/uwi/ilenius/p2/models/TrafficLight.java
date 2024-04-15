@@ -1,12 +1,11 @@
 package com.uwi.ilenius.p2.models;
-import com.uwi.ilenius.p1.Light;
+import com.uwi.ilenius.p2.enums.Light;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
 
 
 public class TrafficLight implements Verifiable{
     private Integer id;
     private Light colour;
-    private Segment segment;
 
     public TrafficLight(Integer id, Light colour) {
         this.id = id;
@@ -15,6 +14,9 @@ public class TrafficLight implements Verifiable{
 
     public Light getColour() {
         return colour;
+    }
+    public Integer getId() {
+        return id;
     }
     public void change() {
         if (colour == Light.Red) {
