@@ -7,14 +7,15 @@ import com.uwi.ilenius.p2.events.CFOSEvent;
 import com.uwi.ilenius.p2.events.LightEvent;
 import com.uwi.ilenius.p2.events.Event;
 import com.uwi.ilenius.p2.interfaces.Closeable;
+import com.uwi.ilenius.p2.interfaces.EventListenerManager;
 import com.uwi.ilenius.p2.interfaces.Openable;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
-import com.uwi.ilenius.events_test.EventListener;
+import com.uwi.ilenius.p2.event_listeners.EventListener;
 // import com.uwi.ilenius.p2.enums.ObjectType;
 import com.uwi.ilenius.p2.enums.Action;
 import com.uwi.ilenius.p2.enums.Light;
 
-public class Segment extends Logable implements Verifiable, Openable, Closeable{
+public class Segment extends Logable implements Verifiable, Openable, Closeable, EventListenerManager{
     private String name;
     private RSStatus status = RSStatus.Open;
     private boolean hasTrain;
@@ -68,7 +69,23 @@ public class Segment extends Logable implements Verifiable, Openable, Closeable{
         this.time = time;
     }
 
-    private void notifyListeners(Event event) {
+    @Override
+    public void registerListener(EventListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void unregisterListener(EventListener listener) {
+        listeners.remove(listener);
+    }
+
+    @Override
+    public List<EventListener> getListeners() {
+        return listeners;
+    }
+
+    @Override
+    public void notifyListeners(Event event) {
         for (EventListener listener : listeners) {
             listener.onEvent(event);
         }

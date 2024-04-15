@@ -4,16 +4,22 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.uwi.ilenius.p2.enums.Action;
 import com.uwi.ilenius.p2.enums.RSStatus;
 import com.uwi.ilenius.p2.events.CFOSEvent;
+import com.uwi.ilenius.p2.events.Event;
 import com.uwi.ilenius.p2.interfaces.Closeable;
 import com.uwi.ilenius.p2.interfaces.Openable;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
+import com.uwi.ilenius.p2.interfaces.EventListenerManager;
+import com.uwi.ilenius.p2.event_listeners.EventListener;
 
 
-public class Route extends Logable implements Verifiable, Openable, Closeable {
+
+public class Route extends Logable implements Verifiable, Openable, Closeable, EventListenerManager {
     private String name;
     private boolean isRoundTrip;
     private RSStatus status = RSStatus.Open;
@@ -21,6 +27,7 @@ public class Route extends Logable implements Verifiable, Openable, Closeable {
     private LinkedList<Train> trainsForRoute;
     private TrainSystem trainSystem;
     private LinkedList<Station> stations;
+    private List<EventListener> listeners = new ArrayList<>();
 
     public Route(String name, boolean isRoundTrip, LinkedList<Station> stations) {
         this.name = name;
@@ -53,7 +60,27 @@ public class Route extends Logable implements Verifiable, Openable, Closeable {
         return stations;
     }
 
+    @Override
+    public void registerListener(EventListener listener) {
+        listeners.add(listener);
+    }
 
+    @Override
+    public void unregisterListener(EventListener listener) {
+        listeners.remove(listener);
+    }
+
+    @Override
+    public List<EventListener> getListeners() {
+        return listeners;
+    }
+
+    @Override
+    public void notifyListeners(Event event) {
+        for (EventListener listener : listeners) {
+            listener.onEvent(event);
+        }
+    }
 
     // Other attributes and methods remain unchanged
 

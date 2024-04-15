@@ -1,20 +1,19 @@
 package com.uwi.ilenius.p2.models;
 
 import java.util.LinkedList;
-import java.util.ListIterator;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
 
 import com.uwi.ilenius.p2.enums.Action;
 import com.uwi.ilenius.p2.event_listeners.EventListener;
-import com.uwi.ilenius.p2.event_listeners.MoveEventListener;
 import com.uwi.ilenius.p2.events.CFOSEvent;
 import com.uwi.ilenius.p2.events.MoveEvent;
+import com.uwi.ilenius.p2.events.Event;
+import com.uwi.ilenius.p2.interfaces.EventListenerManager;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
 
-public class Train extends Logable implements Verifiable {
+
+public class Train extends Logable implements Verifiable, EventListenerManager {
     private Integer id;
     private String name;
     private Integer timeRegistered;
@@ -109,8 +108,26 @@ public class Train extends Logable implements Verifiable {
         return waitTimeRemaining > 0;
     }
 
+    @Override
     public void registerListener(EventListener listener) {
         listeners.add(listener);
+    }
+
+    @Override
+    public void unregisterListener(EventListener listener) {
+        listeners.remove(listener);
+    }
+
+    @Override
+    public List<EventListener> getListeners() {
+        return listeners;
+    }
+
+    @Override
+    public void notifyListeners(Event event) {
+        for (EventListener listener : listeners) {
+            listener.onEvent(event);
+        }
     }
     // public CFOSEvent start() {
     //     if (!isRegistered())
