@@ -212,6 +212,11 @@ public class TrainSystem implements Verifiable {
             for (Segment segment : r.getSegmentsForRoute(this)) {
                 sb.append("- ").append(segment.getName()).append("\n");
             }
+
+            sb.append("Trains:\n");
+            for (Train train : r.getTrainsForRoute(this)) {
+                sb.append("- ").append(train.getName()).append("\n");
+            }
             return sb.toString();
         }
         return null;

@@ -23,8 +23,6 @@ public class Main {
 
 
         // Add segments
-        //TODO: The number of segments is one less that the number of stations.
-        //TODO: Refactor the getSegmentsForRoute method to work with this condition.
         trainSystem.addSegment("Segment 1", "Station A", "Station B");
         trainSystem.addSegment("Segment 2", "Station B", "Station C");
 
