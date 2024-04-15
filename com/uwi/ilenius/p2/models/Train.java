@@ -2,10 +2,14 @@ package com.uwi.ilenius.p2.models;
 
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
 
 import com.uwi.ilenius.p2.enums.Action;
+import com.uwi.ilenius.p2.event_listeners.EventListener;
+import com.uwi.ilenius.p2.event_listeners.MoveEventListener;
 import com.uwi.ilenius.p2.events.CFOSEvent;
 import com.uwi.ilenius.p2.events.MoveEvent;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
@@ -20,6 +24,7 @@ public class Train extends Logable implements Verifiable {
     private Integer waitTimeRemaining;
     private Route route;
     private LinkedList<String> stops;
+    private List<EventListener> listeners = new ArrayList<>();
 
     public Train(Integer id, String name) {
         this.id = id;
@@ -63,6 +68,10 @@ public class Train extends Logable implements Verifiable {
         this.timeRegistered = timeRegistered;
     }
 
+    public void setCurrentLocation(Station currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+
 
     public boolean isRegistered() {
         return timeRegistered != -1;
@@ -100,6 +109,9 @@ public class Train extends Logable implements Verifiable {
         return waitTimeRemaining > 0;
     }
 
+    public void registerListener(EventListener listener) {
+        listeners.add(listener);
+    }
     // public CFOSEvent start() {
     //     if (!isRegistered())
     //         throw new IllegalStateException("Train must be registered before starting.");
@@ -127,16 +139,24 @@ public class Train extends Logable implements Verifiable {
     }
 
 
-    // Advance the train by the given time// Method to advance the train
-    // public MoveEvent advance(int time) {
-    // }
+    // Method to advance the train
+    public MoveEvent advance(int time) {
+        String sourceStation = currentLocation.getName();
+        String destinationStation = nextStation(); ;
 
-    // Get the name of the next station
-    // Method to get the next station of the train
-    // public String nextStation() {
-    //     String currentStationName = currentLocation.getName();
-    //     return isAtStart ? route.getNextStation(currentStationName, true).getName() : route.getPreviousStation(currentStationName, false).getName();
-    // }
+        MoveEvent event = new MoveEvent("Station",time, sourceStation, destinationStation);
+
+        // Notify all registered listeners
+        for (EventListener listener : listeners) {
+            listener.onEvent(event);
+        }
+        return event;
+    }
+
+    public String nextStation() {
+        String currentStationName = currentLocation.getName();
+        return isAtStart ? route.getNextStation(currentStationName, isAtStart()).getName() : route.getPreviousStation(currentStationName, isAtStart()).getName();
+    }
 
     // Add a stop to the train route
     public void addStop(String stop) {

@@ -17,4 +17,16 @@ public class OccupiedEvent extends Event {
     public boolean isEntry() {
         return isEntry;
     }
+
+    @Override
+    public String getObjectName() {
+        // TODO Auto-generated method stub
+        return super.getObjectName();
+    }
+
+    @Override
+    public int getTime() {
+        // TODO Auto-generated method stub
+        return super.getTime();
+    }
 }

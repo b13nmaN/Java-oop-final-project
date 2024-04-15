@@ -19,4 +19,16 @@ public class LightEvent extends Event {
     public Light getToColour() {
         return toColour;
     }
+
+    @Override
+    public String getObjectName() {
+        // TODO Auto-generated method stub
+        return super.getObjectName();
+    }
+
+    @Override
+    public int getTime() {
+        // TODO Auto-generated method stub
+        return super.getTime();
+    }
 }

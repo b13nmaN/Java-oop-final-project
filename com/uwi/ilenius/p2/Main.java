@@ -5,6 +5,9 @@ import com.uwi.ilenius.p2.models.TrainSystem;
 import com.uwi.ilenius.p2.models.Station;
 import com.uwi.ilenius.p2.models.Segment;
 import com.uwi.ilenius.p2.models.Simulator;
+import com.uwi.ilenius.p2.event_listeners.MoveEventListener;
+import com.uwi.ilenius.p2.event_listeners_impl.MoveEventListenerImpl;
+import com.uwi.ilenius.p2.events.MoveEvent;
 import com.uwi.ilenius.p2.models.Route;
 import com.uwi.ilenius.p2.models.Train;
 import java.util.LinkedList;
@@ -48,6 +51,22 @@ public class Main {
         System.out.println(trainSystem.getSegmentInfo("Segment 1"));
         System.out.println(trainSystem.getRouteInfo("Route 1"));
         System.out.println(trainSystem.getTrainInfo("Train 1"));
+
+        // get train by name
+        Train train1 = trainSystem.getTrainByName("Train 1");
+        train1.setCurrentLocation(trainSystem.getStationByName("Station A"));
+
+        //create train listener
+        MoveEventListenerImpl trainListener = new MoveEventListenerImpl();
+
+        // Register train listener
+        train1.registerListener(trainListener);
+
+        // Move the train
+        MoveEvent moveEvent = train1.advance(10);
+
+        // Print the move event
+        System.out.println("Train moved from " + moveEvent.getFromStation() + " " + moveEvent.getToStation() + " " + moveEvent.getTime());
 
         // Verify the train system
         // System.out.println("Train system verification status: " + trainSystem.verify());

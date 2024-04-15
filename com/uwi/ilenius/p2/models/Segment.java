@@ -1,12 +1,15 @@
 package com.uwi.ilenius.p2.models;
 import java.util.List;
+import java.util.ArrayList;
 
 import com.uwi.ilenius.p2.enums.RSStatus;
 import com.uwi.ilenius.p2.events.CFOSEvent;
 import com.uwi.ilenius.p2.events.LightEvent;
+import com.uwi.ilenius.p2.events.Event;
 import com.uwi.ilenius.p2.interfaces.Closeable;
 import com.uwi.ilenius.p2.interfaces.Openable;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
+import com.uwi.ilenius.events_test.EventListener;
 // import com.uwi.ilenius.p2.enums.ObjectType;
 import com.uwi.ilenius.p2.enums.Action;
 import com.uwi.ilenius.p2.enums.Light;
@@ -21,6 +24,7 @@ public class Segment extends Logable implements Verifiable, Openable, Closeable{
     private Station segmentEnd;
     // private List<Train> trainsForRoute;
     private TrainSystem trainSystem;
+    private List<EventListener> listeners = new ArrayList<>();
     // private ObjectType type = ObjectType.Segment_;
     private int time;
 
@@ -64,20 +68,39 @@ public class Segment extends Logable implements Verifiable, Openable, Closeable{
         this.time = time;
     }
 
+    private void notifyListeners(Event event) {
+        for (EventListener listener : listeners) {
+            listener.onEvent(event);
+        }
+    }
+
     public CFOSEvent acceptTrain(Train train, int time) {
         if (!hasTrain && isOpen) {
             hasTrain = true;
-            return new CFOSEvent("Segment", time, Action.OPEN);
+            CFOSEvent event = new CFOSEvent("Segment", time, Action.OPEN);
+
+            // Notify all registered listeners
+            notifyListeners(event);
+
+            return event;
+
+        
         } else {
             System.out.println("Cannot accept train. Segment is occupied or closed.");
             return null;
         }
+
     }
 
     public CFOSEvent releaseTrain(int time) {
         if (hasTrain) {
             hasTrain = false;
-            return new CFOSEvent("Segment", time, Action.CLOSE);
+            CFOSEvent event = new CFOSEvent("Segment", time, Action.CLOSE);
+
+            // Notify all registered listeners
+            notifyListeners(event);
+
+            return event;
         } else {
             System.out.println("No train to release.");
             return null;
@@ -91,10 +114,20 @@ public class Segment extends Logable implements Verifiable, Openable, Closeable{
         switch (trafficLight.getColour()) {
             case Red:
                 trafficLight.change();
-                return new LightEvent("Segment", time, Light.Red, Light.Green);
+                LightEvent event1 = new LightEvent("Segment", time, Light.Red, Light.Green);
+
+                // Notify all registered listeners
+                notifyListeners(event1);
+
+                return event1;
+                
             case Green:
                 trafficLight.change();
-                return new LightEvent("Segment", time, Light.Green, Light.Red);
+                LightEvent event2 = new LightEvent("Segment", time, Light.Green, Light.Red);
+                // Notify all registered listeners
+                notifyListeners(event2);
+
+                return event2;
             default:
                 System.out.println("Invalid colour " + trafficLight.getColour());
                 return null;

@@ -17,4 +17,16 @@ public class MoveEvent extends Event {
     public String getToStation() {
         return toStation;
     }
+
+    @Override
+    public String getObjectName() {
+        // TODO Auto-generated method stub
+        return super.getObjectName();
+    }
+
+    @Override
+    public int getTime() {
+        // TODO Auto-generated method stub
+        return super.getTime();
+    }
 }

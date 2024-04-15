@@ -291,7 +291,7 @@ public class TrainSystem implements Verifiable {
         // Implement logic to advance the train system
     }
 
-    private Station getStationByName(String name) {
+    public Station getStationByName(String name) {
         for (Station station : stations) {
             if (station.getName().equals(name)) {
                 return station;
@@ -300,7 +300,7 @@ public class TrainSystem implements Verifiable {
         return null;
     }
 
-    private Segment getSegmentByName(String name) {
+    public Segment getSegmentByName(String name) {
         for (Segment segment : segments) {
             if (segment.getName().equals(name)) {
                 return segment;
@@ -318,7 +318,7 @@ public class TrainSystem implements Verifiable {
         return null;
     }
 
-    private Train getTrainByName(String tname) {
+    public Train getTrainByName(String tname) {
         for (Train train : trains) {
             if (train.getName().equals(tname)) {
                 return train;
