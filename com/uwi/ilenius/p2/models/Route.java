@@ -60,23 +60,28 @@ public class Route implements Verifiable, Openable, Closeable {
     public LinkedList<Segment> getSegmentsForRoute(TrainSystem trainSystem) {
         LinkedList<Segment> routeSegments = new LinkedList<>();
         LinkedList<Segment> segments = trainSystem.getSegments(); // Assuming getSegments() returns LinkedList<Segment>
-        ListIterator<Station> stationIterator = stations.listIterator(); // Assuming stations is a LinkedList<Station>
+        ListIterator<Station> stationIterator = stations.listIterator();
       
-        for (Segment segment : segments) {
-          while (stationIterator.hasNext()) {
-            Station currentStation = stationIterator.next();
-            if (!stationIterator.hasNext()) {
-              break; // No more stations, exit inner loop
-            }
-            Station nextStation = stationIterator.next();
-            if (segment.getSegmentStart().equals(currentStation) && segment.getSegmentEnd().equals(nextStation)) {
-              routeSegments.add(segment);
-              break; // Move to the next segment
+        Station previousStation = null; // Keep track of the previous station
+      
+        while (stationIterator.hasNext()) {
+          Station currentStation = stationIterator.next();
+      
+          if (previousStation != null) {
+            // Check segments only if there's a previous station (no segment for the first station)
+            for (Segment segment : segments) {
+              if (segment.getSegmentStart().equals(previousStation) && segment.getSegmentEnd().equals(currentStation)) {
+                routeSegments.add(segment);
+                break; // Move to the next segment after finding a match
+              }
             }
           }
+          previousStation = currentStation; // Update previous station for next iteration
         }
+      
         return routeSegments;
       }
+      
       
     // Other methods remain unchanged
 

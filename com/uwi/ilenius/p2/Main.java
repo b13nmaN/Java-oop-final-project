@@ -20,11 +20,13 @@ public class Main {
         trainSystem.addStation("Station A");
         trainSystem.addStation("Station B");
         trainSystem.addStation("Station C");
-        trainSystem.addStation("Station D");
+
 
         // Add segments
+        //TODO: The number of segments is one less that the number of stations.
+        //TODO: Refactor the getSegmentsForRoute method to work with this condition.
         trainSystem.addSegment("Segment 1", "Station A", "Station B");
-        trainSystem.addSegment("Segment 2", "Station C", "Station D");
+        trainSystem.addSegment("Segment 2", "Station B", "Station C");
 
         // Add routes
         LinkedList<Station> stations = trainSystem.getStations();
