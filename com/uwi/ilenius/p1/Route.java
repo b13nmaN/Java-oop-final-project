@@ -54,6 +54,20 @@ public class Route implements Verifiable, Openable, Closeable {
         }
         return null;
     }
+    /**
+     * A description of the function that returns a Station object with the given name, or null if not found.
+     *
+     * @param  name  the name of the station to search for
+     * @return       the Station object with the given name, or null if not found
+     */
+    private Station getStationByName(String name) {
+        for (Station station : stations) {
+            if (station.getName().equals(name)) {
+                return station;
+            }
+        }
+        return null;
+     }
 
     /**
      * Gets the name of the route.
@@ -139,8 +153,22 @@ public class Route implements Verifiable, Openable, Closeable {
         }
         return null;
     }
-
-
+        /**
+     * Retrieves a list of trains that belong to a specific route.
+     *
+     * @param  trainSystem  the TrainSystem containing all trains
+     * @return              a list of trains that belong to the specified route
+     */
+    public LinkedList<Train> getTrainsForRoute(TrainSystem trainSystem) {
+        ListIterator<Train> trainIterator = trainSystem.getTrains().listIterator();
+        while (trainIterator.hasNext()) {
+            Train train = trainIterator.next();
+            if (train.getRoute().getName().equals(name)) {
+                trainsForRoute.add(train);
+            }
+        }
+        return trainsForRoute;
+    }
 
     /**
      * Checks if it's possible to get to the given station.
@@ -148,9 +176,9 @@ public class Route implements Verifiable, Openable, Closeable {
      * @param station  The name of the station.
      * @return true if it's possible to get to the station, false otherwise.
      */
-    public boolean canGetTo(String station) {
-        // Not implemented for this example
-        return false;
+    public boolean canGetTo(String sname) {
+        Station stationObj = getStationByName(sname);
+        return stationObj.isOpen();
     }
 
     /**
@@ -169,24 +197,6 @@ public class Route implements Verifiable, Openable, Closeable {
      */
     public void addSegments(LinkedList<Segment> segments) {
         this.segments.addAll(segments);
-    }
-
-    /**
-     * Adds a train to the route.
-     * 
-     * @param train  The train to add.
-     */
-    public void addTrain(Train train) {
-        trainsForRoute.add(train);
-    }
-
-    /**
-     * Adds multiple trains to the route.
-     * 
-     * @param trains  The trains to add.
-     */
-    public void addTrains(LinkedList<Train> trains) {
-        trainsForRoute.addAll(trains);
     }
 
     /**

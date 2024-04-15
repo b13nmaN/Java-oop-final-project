@@ -47,7 +47,6 @@ public class TrainSystem implements Verifiable {
     public void removeStation(String sname) {
         stations.remove(new Station(sname));
     }
- 
     /**
      * Opens a station with the given name.
      *
@@ -393,6 +392,111 @@ public class TrainSystem implements Verifiable {
      *
      * @return true if the train system is valid, false otherwise
      */
+     
+     //\\\\\\\\\\\\\\\\\\\\\\\\\\\\ START OF GETTERS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+           /**
+       * Returns the list of routes in the train system.
+       *
+       * @return the list of routes in the train system
+       */
+      public LinkedList<Route> getRoutes() {
+          return routes;
+      }
+            /**
+       * Returns the list of stations in the train system.
+       *
+       * @return the list of stations in the train system
+       */
+      public LinkedList<Station> getStations() {
+          return stations;
+      }
+            /**
+       * Returns the list of segments in the train system.
+       *
+       * @return the list of segments in the train system
+       */
+      public LinkedList<Segment> getSegments() {
+          return segments;
+      }
+            /**
+       * Returns the status of the train system.
+       *
+       * @return the status of the train system
+       */
+      public SystemStatus getStatus() {
+          return status;
+      }
+
+            /**
+       * Returns the list of trains in the train system.
+       *
+       * @return the list of trains in the train system
+       */
+      public LinkedList<Train> getTrains() {
+          return trains;
+      }
+     /**
+     * Returns the Station object with the given name, or null if not found.
+     *
+     * @param name the name of the station
+     * @return the Station object with the given name, or null if not found
+     */
+     public Station getStationByName(String name) {
+        for (Station station : stations) {
+            if (station.getName().equals(name)) {
+                return station;
+            }
+        }
+        return null;
+     }
+     
+
+     /**
+     * Returns the Segment object with the given name, or null if not found.
+     *
+     * @param name the name of the segment
+     * @return the Segment object with the given name, or null if not found
+     */
+     public Segment getSegmentByName(String name) {
+        for (Segment segment : segments) {
+            if (segment.getName().equals(name)) {
+                return segment;
+            }
+        }
+        return null;
+     }
+     
+     /**
+     * Returns the Route object with the given name, or null if not found.
+     *
+     * @param name the name of the route
+     * @return the Route object with the given name, or null if not found
+     */
+     public Route getRouteByName(String name) {
+        for (Route route : routes) {
+            if (route.getName().equals(name)) {
+                return route;
+            }
+        }
+        return null;
+     }
+     
+    //\\\\\\\\\\\\\\\\\\\\\\\ END OF GETTERS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+     /**
+     * Returns the Train object with the given ID, or null if not found.
+     *
+     * @param id the ID of the train
+     * @return the Train object with the given ID, or null if not found
+     */
+     private Train getTrainById(Integer id) {
+        for (Train train : trains) {
+            if (train.getId().equals(id)) {
+                return train;
+            }
+        }
+        return null;
+     }
+
      public boolean verify() {
         // A. Verify each object in stations
         Set<String> stationNames = new HashSet<>();
@@ -432,71 +536,9 @@ public class TrainSystem implements Verifiable {
      
      /**
      * Advances the train system to the next state.
-     * This method is not implemented in the provided code.
      */
      public void advance() {
-        // Implement logic to advance the train system
+        status = SystemStatus.Operational;
      }
-     
-     /**
-     * Returns the Station object with the given name, or null if not found.
-     *
-     * @param name the name of the station
-     * @return the Station object with the given name, or null if not found
-     */
-     private Station getStationByName(String name) {
-        for (Station station : stations) {
-            if (station.getName().equals(name)) {
-                return station;
-            }
-        }
-        return null;
-     }
-     
-     /**
-     * Returns the Segment object with the given name, or null if not found.
-     *
-     * @param name the name of the segment
-     * @return the Segment object with the given name, or null if not found
-     */
-     private Segment getSegmentByName(String name) {
-        for (Segment segment : segments) {
-            if (segment.getName().equals(name)) {
-                return segment;
-            }
-        }
-        return null;
-     }
-     
-     /**
-     * Returns the Route object with the given name, or null if not found.
-     *
-     * @param name the name of the route
-     * @return the Route object with the given name, or null if not found
-     */
-     private Route getRouteByName(String name) {
-        for (Route route : routes) {
-            if (route.getName().equals(name)) {
-                return route;
-            }
-        }
-        return null;
-     }
-     
-     /**
-     * Returns the Train object with the given ID, or null if not found.
-     *
-     * @param id the ID of the train
-     * @return the Train object with the given ID, or null if not found
-     */
-     private Train getTrainById(Integer id) {
-        for (Train train : trains) {
-            if (train.getId().equals(id)) {
-                return train;
-            }
-        }
-        return null;
-     }
-
 
 }

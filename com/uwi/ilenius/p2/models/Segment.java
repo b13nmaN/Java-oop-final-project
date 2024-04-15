@@ -87,6 +87,8 @@ public class Segment implements Verifiable, Openable, Closeable{
         }
     }
 
+    
+
     public LightEvent changeLight() {
         // Implement logic to change the light
         switch (trafficLight.getColour()) {

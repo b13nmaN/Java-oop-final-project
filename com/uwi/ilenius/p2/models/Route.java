@@ -81,9 +81,7 @@ public class Route implements Verifiable, Openable, Closeable {
       
         return routeSegments;
       }
-      
-      
-    // Other methods remain unchanged
+
 
 
     public Station getEnd() {
@@ -148,12 +146,6 @@ public class Route implements Verifiable, Openable, Closeable {
         }
         return null;
     }
-
-    // Other methods remain unchanged
-
-
-    
-
 
 
     public LinkedList<Train> getTrainsForRoute(TrainSystem trainSystem) {
