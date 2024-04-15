@@ -13,7 +13,7 @@ import com.uwi.ilenius.p2.enums.Light;
 
 public class Segment implements Verifiable, Openable, Closeable{
     private String name;
-    private RSStatus status;
+    private RSStatus status = RSStatus.Open;
     private boolean hasTrain;
     private boolean isOpen;
     private TrafficLight trafficLight;

@@ -16,7 +16,7 @@ import com.uwi.ilenius.p2.interfaces.Verifiable;
 public class Route implements Verifiable, Openable, Closeable {
     private String name;
     private boolean isRoundTrip;
-    private RSStatus status;
+    private RSStatus status = RSStatus.Open;
     private LinkedList<Segment> segments;
     private LinkedList<Train> trainsForRoute;
     private TrainSystem trainSystem;
@@ -25,7 +25,7 @@ public class Route implements Verifiable, Openable, Closeable {
     public Route(String name, boolean isRoundTrip, LinkedList<Station> stations) {
         this.name = name;
         this.isRoundTrip = isRoundTrip;
-        this.stations =  new LinkedList<>();
+        this.stations = stations;
         // this.segments = new LinkedList<>();
         this.trainsForRoute = new LinkedList<>();
     }
@@ -49,9 +49,37 @@ public class Route implements Verifiable, Openable, Closeable {
         return status;
     }
 
-    public LinkedList<Segment> getSegments() {
-        return segments;
+    public LinkedList<Station> getStations() {
+        return stations;
     }
+
+
+
+    // Other attributes and methods remain unchanged
+
+    public LinkedList<Segment> getSegmentsForRoute(TrainSystem trainSystem) {
+        LinkedList<Segment> routeSegments = new LinkedList<>();
+        LinkedList<Segment> segments = trainSystem.getSegments(); // Assuming getSegments() returns LinkedList<Segment>
+        ListIterator<Station> stationIterator = stations.listIterator(); // Assuming stations is a LinkedList<Station>
+      
+        for (Segment segment : segments) {
+          while (stationIterator.hasNext()) {
+            Station currentStation = stationIterator.next();
+            if (!stationIterator.hasNext()) {
+              break; // No more stations, exit inner loop
+            }
+            Station nextStation = stationIterator.next();
+            if (segment.getSegmentStart().equals(currentStation) && segment.getSegmentEnd().equals(nextStation)) {
+              routeSegments.add(segment);
+              break; // Move to the next segment
+            }
+          }
+        }
+        return routeSegments;
+      }
+      
+    // Other methods remain unchanged
+
 
     public Station getEnd() {
         if (!stations.isEmpty()) {
@@ -123,11 +151,11 @@ public class Route implements Verifiable, Openable, Closeable {
 
 
 
-    public LinkedList<Train> getTrainsForRoute(String routeName) {
+    public LinkedList<Train> getTrainsForRoute(TrainSystem trainSystem) {
         ListIterator<Train> trainIterator = trainSystem.getTrains().listIterator();
         while (trainIterator.hasNext()) {
             Train train = trainIterator.next();
-            if (train.getRoute().getName().equals(routeName)) {
+            if (train.getRoute().getName().equals(name)) {
                 trainsForRoute.add(train);
             }
         }

@@ -5,14 +5,14 @@ import java.util.List;
 import com.uwi.ilenius.p2.enums.SimulatorStatus;
 
 public class Simulator extends Logable {
-    private int currentTime;
+    private int currentTime = 100;
     private SimulatorStatus status;
-    private TrainSystem trainSystem;
+    // private TrainSystem trainSystem;
 
-    public Simulator(TrainSystem trainSystem) {
-        this.currentTime = 0;
+    public Simulator() {
+        this.currentTime = 100;
         this.status = SimulatorStatus.WORKING;
-        this.trainSystem = trainSystem;
+        // this.trainSystem = trainSystem;
     }
 
 

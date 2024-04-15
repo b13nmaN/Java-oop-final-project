@@ -16,7 +16,8 @@ public class TrainSystem implements Verifiable {
     private LinkedList<Train> trains;
     private Simulator simulator;
 
-    public TrainSystem() {
+    public TrainSystem(Simulator simulator) {
+        this.simulator = simulator;
         this.status = SystemStatus.Initialised;
         this.stations = new LinkedList<>();
         this.segments = new LinkedList<>();
@@ -140,7 +141,7 @@ public class TrainSystem implements Verifiable {
             Train train = iterator.next();
             if (train.getName().equals(tname)) {
                 train.changeRoute(getRouteByName(rName));
-                train.setTimeRegistered(simulator.getCurrentTime()); // get the current time of the simulation
+                train.setTimeRegistered(100); // get the current time of the simulation
                 break;
             }
         }
@@ -208,7 +209,7 @@ public class TrainSystem implements Verifiable {
             sb.append("Segments:\n");
 
             // Iterate through the segments using entrySet() to access both key and value
-            for (Segment segment : r.getSegments()) {
+            for (Segment segment : r.getSegmentsForRoute(this)) {
                 sb.append("- ").append(segment.getName()).append("\n");
             }
             return sb.toString();
@@ -303,7 +304,7 @@ public class TrainSystem implements Verifiable {
         return null;
     }
 
-    private Route getRouteByName(String name) {
+    public Route getRouteByName(String name) {
         for (Route route : routes) {
             if (route.getName().equals(name)) {
                 return route;
@@ -332,4 +333,16 @@ public class TrainSystem implements Verifiable {
     public LinkedList<Segment> getSegments() {
         return segments;
     }
+
+
+    @Override
+    public String toString() {
+        return "TrainSystem{" +
+                "stations=" + stations.toString() +
+                ", segments=" + segments.toString() +
+                ", routes=" + routes.toString() +
+                ", trains=" + trains.toString() +
+                '}';
+    }
+
 }
