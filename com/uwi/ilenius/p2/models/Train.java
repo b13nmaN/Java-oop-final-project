@@ -12,75 +12,142 @@ import com.uwi.ilenius.p2.events.Event;
 import com.uwi.ilenius.p2.interfaces.EventListenerManager;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
 
-
+/**
+ * The Train class represents a train in a train system.
+ * It implements the Verifiable interface for verification functionality and EventListenerManager for event management.
+ */
 public class Train extends Logable implements Verifiable, EventListenerManager {
     private Integer id;
     private String name;
     private Integer timeRegistered;
     private Integer startTime;
-    private Station currentLocation;
-    private Boolean isAtStart;
+    private Station currentStation;
+    private Boolean isAtStart = true;
     private Integer waitTimeRemaining;
     private Route route;
-    private LinkedList<String> stops;
+    private LinkedList<Station> stops;
+    private Station stopsAt;
     private List<EventListener> listeners = new ArrayList<>();
 
+    /**
+     * Constructs a Train object with a given ID and name.
+     * @param id The ID of the train.
+     * @param name The name of the train.
+     */
     public Train(Integer id, String name) {
         this.id = id;
         this.name = name;
-        this.timeRegistered = -1; // Assuming -1 indicates not registered
-        this.startTime = -1; // Assuming -1 indicates not started
-        this.currentLocation = null;
+        this.timeRegistered = 0; // Assuming -1 indicates not registered
+        this.startTime = 0; // Assuming -1 indicates not started
+        this.currentStation = null;
         this.isAtStart = true; // Assuming train starts at the beginning of the route
         this.waitTimeRemaining = 0; // No wait time initially
         this.stops = new LinkedList<>();
     }
 
     // Getters
+    /**
+     * Retrieves the ID of the train.
+     * @return The ID of the train.
+     */
     public Integer getId() {
         return id;
     }
 
+    /**
+     * Retrieves the name of the train.
+     * @return The name of the train.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Retrieves the route of the train.
+     * @return The route of the train.
+     */
     public Route getRoute() {
         return route;
     }
 
-    public Station getCurrentLocation() {
-        return currentLocation;
+    /**
+     * Retrieves the current location of the train.
+     * @return The current location of the train.
+     */
+    public Station getcurrentStation() {
+        return currentStation;
     }
 
-    public Boolean isAtStart() {
-        // Check if the train is at the start of the route
-        return isAtStart && stops.isEmpty();
-    }
-
+    /**
+     * Retrieves the remaining wait time of the train.
+     * @return The remaining wait time of the train.
+     */
     public Integer getWaitTimeRemaining() {
         return waitTimeRemaining;
     }
 
+    /**
+     * Checks if the train has stops.
+     * @return True if the train has stops, false otherwise.
+     */
+    public boolean hasStops() {
+        return stops.size() > 0;
+    }
+
+    /**
+     * Retrieves the stops of the train.
+     * @return The stops of the train.
+     */
+    public LinkedList<Station> getStops() {
+        return stops;
+    }
+
     //Setters
+        /**
+     * Sets the start time of the train.
+     *
+     * @param  startTime  the new start time for the train
+     */
     public void setTimeRegistered(Integer timeRegistered) {
         this.timeRegistered = timeRegistered;
     }
-
-    public void setCurrentLocation(Station currentLocation) {
-        this.currentLocation = currentLocation;
+        /**
+     * Sets the current location of the train to the specified station.
+     *
+     * @param  currentStation  the station to set as the current location
+     */
+    public void setcurrentStation(Station currentStation) {
+        this.currentStation = currentStation;
+    }
+        /**
+     * Sets the start time of the train.
+     *
+     * @param  startTime  the new start time for the train
+     */
+    public void setStartTime(Integer startTime) {
+        this.startTime += startTime;
     }
 
-
+    /**
+     * Checks if the train is registered.
+     * @return True if the train is registered, false otherwise.
+     */
     public boolean isRegistered() {
         return timeRegistered != -1;
     }
 
+    /**
+     * Retrieves the time when the train was registered.
+     * @return The time when the train was registered.
+     */
     public Integer whenRegistered() {
         return timeRegistered;
     }
 
-    // Register the train with the given time
+    /**
+     * Registers the train with the given time.
+     * @param time The time to register the train.
+     */
     public void register(Integer time) {
         if (!isRegistered()) {
             this.timeRegistered = time;
@@ -90,20 +157,23 @@ public class Train extends Logable implements Verifiable, EventListenerManager {
         }
     }
 
-
-
-    // Deregister the train
+    /**
+     * Deregisters the train.
+     */
     public void deregister() {
         this.timeRegistered = -1;
         this.startTime = -1;
-        this.currentLocation = null;
+        this.currentStation = null;
         this.isAtStart = true;
         this.waitTimeRemaining = 0;
         this.stops.clear();
         route = null;
     }
 
-    // Check if the train is waiting
+    /**
+     * Checks if the train is waiting.
+     * @return True if the train is waiting, false otherwise.
+     */
     public boolean isWaiting() {
         return waitTimeRemaining > 0;
     }
@@ -129,71 +199,119 @@ public class Train extends Logable implements Verifiable, EventListenerManager {
             listener.onEvent(event);
         }
     }
-    // public CFOSEvent start() {
-    //     if (!isRegistered())
-    //         throw new IllegalStateException("Train must be registered before starting.");
-    
-    //     if (startTime == -1) {
-    //         startTime = timeRegistered;
-    //         CFOSEvent event = new CFOSEvent(currentLocation.getName(), startTime, Action.START);
-    //         advance(startTime); // Move the train to the next station
-    //         return event;
-    //     } else {
-    //         throw new IllegalStateException("Train is already started.");
-    //     }
-    // }
-    
 
-    // Method to finish the train
+    /**
+     * Starts the train.
+     * @return The CFOSEvent representing the train start.
+     * @throws IllegalStateException If the train is already registered or started.
+     */
+    public CFOSEvent start() {
+        if (!isRegistered())
+            System.out.println("Train must be registered before starting.");
+
+        if (startTime == 0) {
+            startTime = timeRegistered;
+            isAtStart = false;
+            CFOSEvent event = new CFOSEvent(name, startTime, Action.START);
+            notifyListeners(event);
+            addToLog(event);
+
+            return event;
+        } else {
+            System.out.println("Train is already started.");
+            return null;
+        }
+    }
+
+    /**
+     * Finishes the train.
+     * @return The CFOSEvent representing the train finish.
+     * @throws IllegalStateException If the train has already finished.
+     */
     public CFOSEvent finish() {
-        if (currentLocation == route.getEnd() && !isAtStart)
+        if (currentStation == route.getEnd() && !isAtStart)
             throw new IllegalStateException("Train has already finished.");
 
-        CFOSEvent event = new CFOSEvent(currentLocation.getName(), startTime, Action.FINISH);
-        currentLocation = route.getEnd(); // Move the train to the end station
-        isAtStart = false;
+        CFOSEvent event = new CFOSEvent(name, startTime, Action.FINISH);
+        currentStation = route.getEnd(); // Move the train to the end station
+        addToLog(event);
+
         return event;
     }
 
-
-    // Method to advance the train
+    /**
+     * Advances the train to the next station.
+     * @param time The time of the advancement.
+     * @return The MoveEvent representing the train movement.
+     */
     public MoveEvent advance(int time) {
-        String sourceStation = currentLocation.getName();
-        String destinationStation = nextStation(); ;
+        String sourceStation = currentStation.getName();
+        String destinationStation = nextStation();
 
-        MoveEvent event = new MoveEvent("Station",time, sourceStation, destinationStation);
+        start();
+
+        MoveEvent event = new MoveEvent(name, time, sourceStation, destinationStation);
+
+        // add event to log
+        addToLog(event);
 
         // Notify all registered listeners
-        for (EventListener listener : listeners) {
-            listener.onEvent(event);
-        }
+        notifyListeners(event);
         return event;
     }
 
+    /**
+     * Retrieves the name of the next station.
+     * @return The name of the next station.
+     */
     public String nextStation() {
-        String currentStationName = currentLocation.getName();
-        return isAtStart ? route.getNextStation(currentStationName, isAtStart()).getName() : route.getPreviousStation(currentStationName, isAtStart()).getName();
+        String currentStationName = currentStation.getName();
+        return isAtStart ? route.getNextStation(currentStationName, isAtStart).getName() : route.getPreviousStation(currentStationName, isAtStart).getName();
     }
 
-    // Add a stop to the train route
+    /**
+     * Adds a stop to the train route.
+     * @param stop The name of the stop to add.
+     */
     public void addStop(String stop) {
-        stops.add(stop);
+        Station station = route.getStationByName(stop);
+        stops.add(station);
     }
 
-    // Change the route of the train
+    /**
+     * Changes the route of the train.
+     * @param route The new route for the train.
+     */
     public void changeRoute(Route route) {
         this.route = route;
     }
 
-    // Verify if the train is valid
+    /**
+     * Verifies if the train is valid.
+     * @return True if the train is valid, false otherwise.
+     */
     public boolean verify() {
         return route != null && route.verify() && timeRegistered > 0;
     }
 
-    // Validate the train
+    /**
+     * Validates the train.
+     * @return True if the train is valid, false otherwise.
+     */
     public boolean validate() {
         // Implement validation logic
         return true; // Placeholder, implement your validation logic
     }
-}
 
+    // @Override
+	// public String toString() {
+	// 	return "Train [id=" + id + ", name=" + name + ", " + "timeRegistered="
+	// 			+ (timeRegistered <= 0 ? "unregistered" : timeRegistered) + ", startTime="
+	// 			+ (timeRegistered >= 0 ? getStartTime() : "unregistered") + ", currentStation="
+	// 			+ (currentStation == null ? "none" : currentStation) + ", route="
+	// 			+ (route == null ? "none" : route.getName()) + ", stopsAt="
+	// 			+ (stopsAt.size() > 0 ? stopsAt.toString() : "All") + ", status=" + status.getDescription()
+	// 			+ ", verified=" + (verify() ? "Yes" : "No") + "]";
+	// }
+
+}

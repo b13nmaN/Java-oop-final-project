@@ -3,10 +3,10 @@ package com.uwi.ilenius.p2.event_listeners_impl;
 import com.uwi.ilenius.p2.event_listeners.EventListener;
 import com.uwi.ilenius.p2.event_listeners.OccupiedEventListener;
 import com.uwi.ilenius.p2.events.OccupiedEvent;
-class OccupiedEventListenerImpl implements OccupiedEventListener, EventListener {
+public class OccupiedEventListenerImpl implements OccupiedEventListener, EventListener {
     @Override
     public void onOccupiedEvent(OccupiedEvent event) {
-        // Implementation logic for OccupiedEvent
+        System.out.println(event.getObject() + " is occupied with " + event.getTrain().getName() + " at " + event.getTime());
     }
 
     @Override
