@@ -28,8 +28,7 @@ public class TrainSystem implements Verifiable {
      *
      * @param simulator the simulator object used to manage the simulation time
      */
-    public TrainSystem(Simulator simulator) {
-        this.simulator = simulator;
+    public TrainSystem() {
         this.status = SystemStatus.Initialised;
         this.stations = new LinkedList<>();
         this.segments = new LinkedList<>();
@@ -39,7 +38,9 @@ public class TrainSystem implements Verifiable {
     }
 
 
-
+    public void setEvents(LinkedList<Event> events) {
+        this.events = events;
+    }
     /**
  * Retrieves an object of the given type by name.
  *
@@ -74,14 +75,14 @@ public Object getObjectByName(ObjectType type, String name) {
      *
      * @return a LinkedList containing all the events from the TrainSystem
      */
-    public LinkedList<String> getAllEvents() {
-        LinkedList<String> allEvents = new LinkedList<>();
+    public LinkedList<Event> getAllEvents() {
+        LinkedList<Event> allEvents = new LinkedList<>();
     
         // Iterate through each station and retrieve events
         for (Station station : stations) {
             Logable logable = (Logable) getObjectByName(ObjectType.Station_, station.getName());
             if (logable != null) {
-                allEvents.addAll(logable.getEvents());
+                allEvents.addAll(logable.getEventsAsTypeEvent());
             }
         }
     
@@ -89,7 +90,7 @@ public Object getObjectByName(ObjectType type, String name) {
         for (Segment segment : segments) {
             Logable logable = (Logable) getObjectByName(ObjectType.Segment_, segment.getName());
             if (logable != null) {
-                allEvents.addAll(logable.getEvents());
+                allEvents.addAll(logable.getEventsAsTypeEvent());
             }
         }
     
@@ -97,7 +98,7 @@ public Object getObjectByName(ObjectType type, String name) {
         for (Route route : routes) {
             Logable logable = (Logable) getObjectByName(ObjectType.Route_, route.getName());
             if (logable != null) {
-                allEvents.addAll(logable.getEvents());
+                allEvents.addAll(logable.getEventsAsTypeEvent());
             }
         }
     
@@ -105,7 +106,7 @@ public Object getObjectByName(ObjectType type, String name) {
         for (Train train : trains) {
             Logable logable = (Logable) getObjectByName(ObjectType.Train_, train.getName());
             if (logable != null) {
-                allEvents.addAll(logable.getEvents());
+                allEvents.addAll(logable.getEventsAsTypeEvent());
             }
         }
     
@@ -118,12 +119,14 @@ public Object getObjectByName(ObjectType type, String name) {
      * @return void
      */
     public void displayEvents() {
-        LinkedList<String> allEvents = getAllEvents();
+        LinkedList<Event> allEvents = getAllEvents();
         System.out.println("List of Events:");
-        for (String event : allEvents) {
+        for (Event event : allEvents) {
             System.out.println(event.toString());
         }
     }
+
+
     
     /**
      * Adds a new station with the given name to the train system.
@@ -177,14 +180,27 @@ public Object getObjectByName(ObjectType type, String name) {
      * @param sEnd  the name of the end station for the segment
      */
     public void addSegment(String sname, String start, String sEnd) {
-        if (!containsSegment(sname)) {
-            Station startStation = getStationByName(start);
-            Station endStation = getStationByName(sEnd);
-            if (startStation != null && endStation != null) {
-                segments.add(new Segment(sname, startStation, endStation));
-            }
+        if (containsSegment(sname)) {
+            System.out.println("Segment with name " + sname + " already exists.");
+            return;
         }
+    
+        Station startStation = getStationByName(start);
+        if (startStation == null) {
+            System.out.println("Start station with name " + start + " not found.");
+            return;
+        }
+    
+        Station endStation = getStationByName(sEnd);
+        if (endStation == null) {
+            System.out.println("End station with name " + sEnd + " not found.");
+            return;
+        }
+    
+        // If startStation and endStation are both found, add the segment
+        segments.add(new Segment(sname, startStation, endStation));
     }
+    
 
     /**
      * Removes the segment with the given name from the train system.
@@ -465,6 +481,7 @@ public Object getObjectByName(ObjectType type, String name) {
      * Advances the train system's simulation.
      */
     public LinkedList<Event> advance() {
+        LinkedList<Event> events = getAllEvents();
         return events;
     }
 
@@ -476,6 +493,7 @@ public Object getObjectByName(ObjectType type, String name) {
      */
     public Station getStationByName(String name) {
         for (Station station : stations) {
+            String station2 = station.getName();
             if (station.getName().equals(name)) {
                 return station;
             }
@@ -492,6 +510,7 @@ public Object getObjectByName(ObjectType type, String name) {
     public Segment getSegmentByName(String name) {
         for (Segment segment : segments) {
             if (segment.getName().equals(name)) {
+
                 return segment;
             }
         }

@@ -4,7 +4,8 @@ public enum SimulatorStatus {
     INITIALISED("Initialised"),
     OPERATIONAL("Operational"),
     DEADLOCKED("Deadlocked"),
-    FINISHED("Finished");
+    FINISHED("Finished"),
+    UNINITIALISED("Uninitialised");
 
     private String description;
 

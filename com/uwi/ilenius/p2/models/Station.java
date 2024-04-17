@@ -12,18 +12,19 @@ import com.uwi.ilenius.p2.interfaces.Openable;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
 import com.uwi.ilenius.p2.interfaces.EventListenerManager;
 import com.uwi.ilenius.p2.event_listeners.EventListener;
+import com.uwi.ilenius.p2.interfaces.TimeObserver;
 
 /**
  * The Station class represents a station in a train system.
  * It implements various interfaces for functionality and event management.
  */
-public class Station extends Logable implements Verifiable, Openable, Closeable, EventListenerManager {
+public class Station extends Logable implements Verifiable, Openable, Closeable, EventListenerManager, TimeObserver {
     private String name;
     private RSStatus status = RSStatus.Open;
     private boolean hasTrain = false;
     private boolean isOpen;
     private Train trainInStation = null;
-    private int time = 0;
+    private int time;
     private List<EventListener> listeners = new ArrayList<>();
 
     /**
@@ -51,13 +52,7 @@ public class Station extends Logable implements Verifiable, Openable, Closeable,
         return status;
     }
 
-    /**
-     * Sets the current time.
-     * @param time The current time to set.
-     */
-    public void setTime(int time) {
-        this.time = time;
-    }
+
 
     /**
      * Retrieves the train currently in the station.
@@ -65,6 +60,15 @@ public class Station extends Logable implements Verifiable, Openable, Closeable,
      */
     public Train getTrainInStation() {
         return trainInStation;
+    }
+        /**
+     * Updates the current time of the object with the given current time.
+     *
+     * @param  currentTime  the current time to set
+     */
+    @Override
+    public void updateTime(int currentTime) {
+        this.time = currentTime;
     }
 
     /**

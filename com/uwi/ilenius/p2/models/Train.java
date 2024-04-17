@@ -11,12 +11,13 @@ import com.uwi.ilenius.p2.events.MoveEvent;
 import com.uwi.ilenius.p2.events.Event;
 import com.uwi.ilenius.p2.interfaces.EventListenerManager;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
+import com.uwi.ilenius.p2.interfaces.TimeObserver;
 
 /**
  * The Train class represents a train in a train system.
  * It implements the Verifiable interface for verification functionality and EventListenerManager for event management.
  */
-public class Train extends Logable implements Verifiable, EventListenerManager {
+public class Train extends Logable implements Verifiable, EventListenerManager, TimeObserver {
     private Integer id;
     private String name;
     private Integer timeRegistered;
@@ -25,8 +26,9 @@ public class Train extends Logable implements Verifiable, EventListenerManager {
     private Boolean isAtStart = true;
     private Integer waitTimeRemaining;
     private Route route;
-    private LinkedList<Station> stops;
+    private LinkedList<String> stops;
     private Station stopsAt;
+    private int time;
     private List<EventListener> listeners = new ArrayList<>();
 
     /**
@@ -37,12 +39,13 @@ public class Train extends Logable implements Verifiable, EventListenerManager {
     public Train(Integer id, String name) {
         this.id = id;
         this.name = name;
-        this.timeRegistered = 0; // Assuming -1 indicates not registered
-        this.startTime = 0; // Assuming -1 indicates not started
+        this.timeRegistered = -1; // Assuming -1 indicates not registered
+        this.startTime = -1; // Assuming -1 indicates not started
         this.currentStation = null;
         this.isAtStart = true; // Assuming train starts at the beginning of the route
-        this.waitTimeRemaining = 0; // No wait time initially
+        this.waitTimeRemaining = -1; // No wait time initially
         this.stops = new LinkedList<>();
+        this.time = 0;
     }
 
     // Getters
@@ -70,6 +73,7 @@ public class Train extends Logable implements Verifiable, EventListenerManager {
         return route;
     }
 
+    
     /**
      * Retrieves the current location of the train.
      * @return The current location of the train.
@@ -77,6 +81,7 @@ public class Train extends Logable implements Verifiable, EventListenerManager {
     public Station getcurrentStation() {
         return currentStation;
     }
+
 
     /**
      * Retrieves the remaining wait time of the train.
@@ -98,8 +103,13 @@ public class Train extends Logable implements Verifiable, EventListenerManager {
      * Retrieves the stops of the train.
      * @return The stops of the train.
      */
-    public LinkedList<Station> getStops() {
+    public LinkedList<String> getStops() {
         return stops;
+    }
+
+    @Override
+    public void updateTime(int currentTime) {
+        this.time = currentTime;
     }
 
     //Setters
@@ -126,6 +136,10 @@ public class Train extends Logable implements Verifiable, EventListenerManager {
      */
     public void setStartTime(Integer startTime) {
         this.startTime += startTime;
+    }
+
+    public void setWaitTimeRemaining(Integer waitTimeRemaining) {
+        this.waitTimeRemaining = (timeRegistered + startTime) - time;
     }
 
     /**
@@ -175,7 +189,7 @@ public class Train extends Logable implements Verifiable, EventListenerManager {
      * @return True if the train is waiting, false otherwise.
      */
     public boolean isWaiting() {
-        return waitTimeRemaining > 0;
+        return waitTimeRemaining == time;
     }
 
     @Override
@@ -247,18 +261,55 @@ public class Train extends Logable implements Verifiable, EventListenerManager {
     public MoveEvent advance(int time) {
         String sourceStation = currentStation.getName();
         String destinationStation = nextStation();
-
+    
         start();
-
-        MoveEvent event = new MoveEvent(name, time, sourceStation, destinationStation);
-
-        // add event to log
+    
+        // Calculate time taken to traverse the segment
+        int segmentTime; // Time for traversing a segment
+    
+        if (isAtStart || stopsAt == null || !stopsAt.equals(currentStation)) {
+            // Train does not need to stop at the end station or it's not a stop station
+            segmentTime = 1; // Train takes 1 unit of time to traverse the segment
+        } else {
+            // Train needs to stop at the end station
+            segmentTime = 2; // Train takes 2 units of time to traverse the segment
+        }
+    
+        // Check if the current station is in the stops list
+        if (stops.contains(currentStation)) {
+            // Move event when the train stops at a stop station
+            MoveEvent stopEvent = new MoveEvent(name, time, sourceStation, destinationStation);
+            addToLog(stopEvent);
+            notifyListeners(stopEvent);
+    
+            // Update waiting time
+            waitTimeRemaining = 1;
+        }
+    
+        // Move event when the train passes through a non-stop station
+        MoveEvent event;
+        if (!isWaiting()) {
+            // Train is not waiting, so it can advance normally
+            int arrivalTime = time + segmentTime;
+            event = new MoveEvent(name, arrivalTime, sourceStation, destinationStation);
+        } else {
+            // Train is waiting, so it does not move yet
+            event = new MoveEvent(name, time + 1, sourceStation, destinationStation);
+            waitTimeRemaining--; // Decrement wait time remaining
+        }
+    
+        // Update the current station
+        currentStation = route.getStationByName(destinationStation);
+    
+        // Add event to log
         addToLog(event);
-
+    
         // Notify all registered listeners
         notifyListeners(event);
         return event;
     }
+    
+    
 
     /**
      * Retrieves the name of the next station.
@@ -274,8 +325,7 @@ public class Train extends Logable implements Verifiable, EventListenerManager {
      * @param stop The name of the stop to add.
      */
     public void addStop(String stop) {
-        Station station = route.getStationByName(stop);
-        stops.add(station);
+        stops.add(stop);
     }
 
     /**

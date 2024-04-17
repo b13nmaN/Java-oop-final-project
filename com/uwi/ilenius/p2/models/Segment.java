@@ -10,6 +10,7 @@ import com.uwi.ilenius.p2.events.Event;
 import com.uwi.ilenius.p2.interfaces.Closeable;
 import com.uwi.ilenius.p2.interfaces.EventListenerManager;
 import com.uwi.ilenius.p2.interfaces.Openable;
+import com.uwi.ilenius.p2.interfaces.TimeObserver;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
 import com.uwi.ilenius.p2.event_listeners.EventListener;
 // import com.uwi.ilenius.p2.enums.ObjectType;
@@ -21,7 +22,7 @@ import com.uwi.ilenius.p2.enums.Light;
  * It manages the traffic light, train occupancy, and events related to opening, closing, and train movement.
  * The class implements the Verifiable, Openable, Closeable, and EventListenerManager interfaces.
  */
-public class Segment extends Logable implements Verifiable, Openable, Closeable, EventListenerManager {
+public class Segment extends Logable implements Verifiable, Openable, Closeable, EventListenerManager, TimeObserver {
     private String name;
     private RSStatus status = RSStatus.Open;
     private boolean hasTrain;
@@ -128,7 +129,10 @@ public class Segment extends Logable implements Verifiable, Openable, Closeable,
         this.train = train;
     }
 
-
+    @Override
+    public void updateTime(int currentTime) {
+        this.time = currentTime;
+    }
     /**
      * Registers an event listener to receive events from this segment.
      *

@@ -44,8 +44,6 @@ public class MoveEventListenerImpl implements MoveEventListener, EventListener {
         
         Segment segment = route.getSegmentByStartStation(nextStation);
 
-
-        //TODO: 
         // Check if the next segment and station are available for the train to move
         if (nextStation.isOpen() && !segment.hasTrain()) {
 
@@ -58,7 +56,7 @@ public class MoveEventListenerImpl implements MoveEventListener, EventListener {
                 segment.close(); // Close the segment after the train moves
 
                 // Log the movement of the train
-                train.setStartTime(time + 1);
+                // train.setStartTime(time + 1);
                 segment.open();
             } else {
                 for (Station stop : train.getStops()) {
@@ -75,7 +73,7 @@ public class MoveEventListenerImpl implements MoveEventListener, EventListener {
                         segment.setTime(time);
 
                         // Log the movement of the train
-                        train.setStartTime(time + 2);
+                        // train.setStartTime(time + 2);
                         segment.setTime(time);
                         segment.open();
                         nextStation.setTrainInStation(null);

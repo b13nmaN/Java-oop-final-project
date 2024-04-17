@@ -13,6 +13,7 @@ import com.uwi.ilenius.p2.events.CFOSEvent;
 import com.uwi.ilenius.p2.events.Event;
 import com.uwi.ilenius.p2.interfaces.Closeable;
 import com.uwi.ilenius.p2.interfaces.Openable;
+import com.uwi.ilenius.p2.interfaces.TimeObserver;
 import com.uwi.ilenius.p2.interfaces.Verifiable;
 import com.uwi.ilenius.p2.interfaces.EventListenerManager;
 import com.uwi.ilenius.p2.event_listeners.EventListener;
@@ -23,7 +24,7 @@ import com.uwi.ilenius.p2.event_listeners.EventListener;
 /**
  * Represents a route in the train system.
  */
-public class Route extends Logable implements Verifiable, Openable, Closeable, EventListenerManager {
+public class Route extends Logable implements Verifiable, Openable, Closeable, EventListenerManager, TimeObserver{
     private String name;
     private boolean isRoundTrip;
     private RSStatus status = RSStatus.Open;
@@ -32,7 +33,7 @@ public class Route extends Logable implements Verifiable, Openable, Closeable, E
     private TrainSystem trainSystem;
     private LinkedList<Station> stations;
     private List<EventListener> listeners = new ArrayList<>();
-    private int time = 0;
+    private int time;
 
     /**
      * Constructor for Route.
@@ -143,6 +144,11 @@ public class Route extends Logable implements Verifiable, Openable, Closeable, E
      */
     public void setSegments(LinkedList<Segment> segments) {
         this.segments = segments;
+    }
+
+    @Override
+    public void updateTime(int currentTime) {
+        this.time = currentTime;
     }
         /**
      * Registers an event listener.

@@ -7,7 +7,8 @@ public enum SystemStatus {
     Initialised("System is Initialised"), // The system is initialised
     Operational("System is Operational"), // The system is operational
     Deadlocked("System is Deadlocked"), // The system is deadlocked
-    Finished("No More trains!"); // The system has finished operation
+    Finished("No More trains!"), // The system has finished operation
+    Uninitialised("System is Uninitialised");
 
     private String description; // The description of the system status
 

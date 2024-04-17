@@ -77,6 +77,10 @@ abstract public class Logable {
         return true;
     }
 
+    public List<Event> getEventsAsTypeEvent() {
+        return new ArrayList<>(events);
+    }
+
     /**
      * Retrieves all events in the log.
      *
