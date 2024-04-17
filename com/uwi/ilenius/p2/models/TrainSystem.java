@@ -112,6 +112,14 @@ public Object getObjectByName(ObjectType type, String name) {
     
         return allEvents;
     }
+        /**
+     * Sets the status of the TrainSystem to the specified SystemStatus.
+     *
+     * @param  status  the SystemStatus to set the TrainSystem's status to
+     */
+    public void setStatus(SystemStatus status) {
+        this.status = status;
+    }
     
         /**
      * Displays all the events in the TrainSystem.
@@ -500,7 +508,17 @@ public Object getObjectByName(ObjectType type, String name) {
         }
         return null;
     }
-
+        /**
+     * Determines if there are any closures hindering movement in the train system.
+     *
+     * @return  true if there are closures hindering movement, false otherwise
+     */
+    public boolean closuresHinderingMovement() {
+        if(SystemStatus.Deadlocked.equals(status)) {
+            return true;
+        }
+        return false;
+    }
     /**
      * Returns the segment object with the given name.
      *
@@ -573,13 +591,23 @@ public Object getObjectByName(ObjectType type, String name) {
     public LinkedList<Segment> getSegments() {
         return segments;
     }
+        /**
+     * Returns the list of routes in the train system.
+     *
+     * @return the list of routes in the train system
+     */
+    public LinkedList<Route> getRoutes() {
+        return routes;
+    }
 
     /**
      * Returns a string representation of the train system, including its stations, segments, routes, and trains.
      *
      * @return a string representation of the train system
      */
-   public void validate(){
-  
+
+   public boolean validateObjectLog(Object ObjectType, String id, LinkedList<String> log) {
+
+    return true;
    }
 }

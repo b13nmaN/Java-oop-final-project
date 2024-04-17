@@ -97,6 +97,7 @@ public class Station extends Logable implements Verifiable, Openable, Closeable,
         return name != null && !name.trim().isEmpty();
     }
 
+
     /**
      * Closes the station.
      * @return The CFOSEvent representing the station closure.
@@ -180,7 +181,28 @@ public class Station extends Logable implements Verifiable, Openable, Closeable,
      * @return true if the validation passes, false otherwise
      */
     public boolean validate() {
-        // Custom validation logic can be added here
-        return true;
+        boolean isValid = true;
+
+        // Check if name is not null or empty
+        if (name == null || name.isEmpty()) {
+            System.out.println("Error: Station name cannot be null or empty.");
+            isValid = false;
+        }
+
+        // Check if status is not null
+        if (status == null) {
+            System.out.println("Error: Station status cannot be null.");
+            isValid = false;
+        }
+
+        // Check if time is positive
+        if (time < 0) {
+            System.out.println("Error: Time cannot be negative.");
+            isValid = false;
+        }
+
+        // Add more validation rules here if needed
+
+        return isValid;
     }
 }

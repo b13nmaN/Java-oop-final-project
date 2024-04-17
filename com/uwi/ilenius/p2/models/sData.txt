@@ -1,4 +1,4 @@
- 0
+ 1
  Stations: 11
  West Ruislip
  East Broadway
@@ -27,9 +27,14 @@
  train_2:0: R_EB_EP: all
  train_3:5: R_EB_EP: Noting Hill Gate; Liverpool Street
  train_4:1: R_EB_EP: all
+ 3
  Events: 1
  Close: Segment: basbs
+ 8
  Events: 1
  Open: Segment: basbs
  Trains: 1
  train_6:1: R_BAS_EP: Liverpool Street
+ 9
+ Events: 1
+ Close: Route: R_WS_EP

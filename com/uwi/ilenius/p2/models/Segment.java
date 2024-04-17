@@ -48,7 +48,6 @@ public class Segment extends Logable implements Verifiable, Openable, Closeable,
         this.isOpen = true;
         this.segmentStart = segmentStart;
         this.segmentEnd = segmentEnd;
-        this.time = 0;
     }
 
 
@@ -273,17 +272,29 @@ public class Segment extends Logable implements Verifiable, Openable, Closeable,
         if(lightColour()) {
             changeLight();
         }
-        Train train = segmentStart.getTrainInStation();
-        setHasTrain(true);
-        segmentStart.close();
-        segmentStart.setTrainInStation(train);
-        CFOSEvent event = new CFOSEvent(name, time, Action.CLOSE);
-        addToLog(event);
-        
+        if(!hasTrain) {
+            status = RSStatus.ClosedForMaintenance;
+            CFOSEvent event = new CFOSEvent(name, time, Action.CLOSE);
+            addToLog(event);
+            notifyListeners(event);
+            return event;
+        } else {
+            Train train = segmentStart.getTrainInStation();
+            setHasTrain(true);
+            segmentStart.close();
+            segmentStart.setTrainInStation(train);
+            CFOSEvent event = new CFOSEvent(name, time, Action.CLOSE);
+            addToLog(event);
+        notifyListeners(event);
 
         // Notify all registered listeners
-        notifyListeners(event);
         return event;
+
+        }
+        
+        
+
+        // Notify all registered listener
     }
 
     /**
@@ -292,18 +303,31 @@ public class Segment extends Logable implements Verifiable, Openable, Closeable,
      * @return a CFOSEvent representing the opening of the segment
      */
     public CFOSEvent open() {
-        releaseTrain(time);
+        if (!hasTrain) {
         changeLight();
-        setHasTrain(false);
         segmentStart.open();
         CFOSEvent event = new CFOSEvent(name, time, Action.OPEN);
         addToLog(event);
+         // Notify all registered listeners
+         notifyListeners(event);
+
+         return event;
+        }else{
+            releaseTrain(time);
+        changeLight();
+        setHasTrain(true);
+        segmentStart.open();
+        CFOSEvent event = new CFOSEvent(name, time, Action.OPEN);
+        addToLog(event);
+         // Notify all registered listeners
+         notifyListeners(event);
+
+         return event;
+        }
+        
         
 
-        // Notify all registered listeners
-        notifyListeners(event);
-
-        return event;
+       
     }
 
    /**
@@ -335,10 +359,30 @@ public class Segment extends Logable implements Verifiable, Openable, Closeable,
         return true;
     }
 
-    @Override
     public boolean validate() {
-        // TODO Auto-generated method stub
-        return super.validate();
+        boolean isValid = true;
+
+        // Check if name is not null or empty
+        if (name == null || name.isEmpty()) {
+            System.out.println("Error: Segment name cannot be null or empty.");
+            isValid = false;
+        }
+
+        // Check if segmentStart is not null
+        if (segmentStart == null) {
+            System.out.println("Error: Segment start station cannot be null.");
+            isValid = false;
+        }
+
+        // Check if segmentEnd is not null
+        if (segmentEnd == null) {
+            System.out.println("Error: Segment end station cannot be null.");
+            isValid = false;
+        }
+
+        // Add more validation rules here if needed
+
+        return isValid;
     }
 
     @Override

@@ -404,9 +404,33 @@ public class Route extends Logable implements Verifiable, Openable, Closeable, E
      *
      * @return         the CFOSEvent created for the close action
      */
+    
+        /**
+     * Validates the route by checking for loops (except for round trips).
+     *
+     * @return true if the route is valid, false otherwise
+     */
+    public boolean validate() {
+      
+        // H. Check for loops (except for round trips)
+        if (!isRoundTrip) {
+          Set<Station> visitedStations = new HashSet<>();
+          for (Segment segment : segments) {
+            Station startStation = segment.getSegmentStart();
+            if (visitedStations.contains(startStation)) {
+              return false; // Loop detected
+            }
+            visitedStations.add(startStation);
+          }
+        }
+      
+        return true;
+      }
+      
     public CFOSEvent close() {
+        status = RSStatus.ClosedForMaintenance;
         CFOSEvent event = new CFOSEvent(name, time, Action.CLOSE);
-
+        addToLog(event);
         // Notify all registered listeners
         notifyListeners(event);
         return event;
@@ -417,6 +441,7 @@ public class Route extends Logable implements Verifiable, Openable, Closeable, E
      * @return         the CFOSEvent created for the open action
      */
     public CFOSEvent open() {
+        status = RSStatus.Open;
         CFOSEvent event = new CFOSEvent(name, time, Action.OPEN);
 
         // Notify all registered listeners

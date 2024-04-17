@@ -59,8 +59,9 @@ public class MoveEventListenerImpl implements MoveEventListener, EventListener {
                 // train.setStartTime(time + 1);
                 segment.open();
             } else {
-                for (Station stop : train.getStops()) {
-                    if (stop.getName().equals(event.getToStation())) {
+                for (String stop : train.getStops()) {
+                    
+                    if (stop.equals(event.getToStation())) {
                         // Update train's current location
                         train.setcurrentStation(nextStation);
                         // Move the train to the next station

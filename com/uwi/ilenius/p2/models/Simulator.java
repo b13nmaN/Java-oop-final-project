@@ -13,23 +13,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-// import com.uwi.ilenius.p2.models.TrainSystem;
-// import com.uwi.ilenius.p2.models.Station;
-// import com.uwi.ilenius.p2.models.Segment;
-// import com.uwi.ilenius.p2.models.Simulator;
-// import com.uwi.ilenius.p2.event_listeners.MoveEventListener;
 import com.uwi.ilenius.p2.event_listeners_impl.MoveEventListenerImpl;
 import com.uwi.ilenius.p2.event_listeners_impl.CFOSEventListenerImpl;
 import com.uwi.ilenius.p2.event_listeners_impl.LightEventListenerImpl;
 import com.uwi.ilenius.p2.event_listeners_impl.OccupiedEventListenerImpl;
-// import com.uwi.ilenius.p2.events.MoveEvent;
-// import com.uwi.ilenius.p2.events.OccupiedEvent;
-// import com.uwi.ilenius.p2.models.Route;
-// import com.uwi.ilenius.p2.models.Train;
-// import java.util.LinkedList;
 
-// import com.uwi.ilenius.p2.events.CFOSEvent;
-// import com.uwi.ilenius.p2.events.Event;
 
 
 /**
@@ -46,11 +34,13 @@ public class Simulator extends Logable {
     private LinkedList<TimeObserver> observers = new LinkedList<>();
     private String initialisationFile;
     private List<List<String>> eventsLog = new ArrayList<>();
-
+    private int eventEventsCounter = 0;
+    private boolean isRegistered = false;
     /**
      * Constructs a new Simulator object with the initial time set to 100 and status set to WORKING.
      */
     public Simulator(String initialisationFile) throws FileNotFoundException {
+        setInitialised();
         this.currentTime = 0;
         this.status = SimulatorStatus.INITIALISED;
         this.initialisationFile = initialisationFile;
@@ -80,132 +70,168 @@ public class Simulator extends Logable {
       }
 
       // Method to execute events based on their type and associated objects
-private void executeEvent(String eventType, String objectType, String objectID, int time) {
-    switch (objectType) {
-        case "Segment":
-            
-            Segment segment = trainSystem.getSegmentByName(objectID);
-            if (segment != null) {
-                switch (eventType) {
-                    case "Close":
-                        segment.close();
-                        break;
-                    case "Open":
-                        segment.open();
-                        break;
-                    // Add other segment event types here
+    private void executeEvent(String eventType, String objectType, String objectID, String time) {
+        if (!isRegistered) {
+            registerEventListeners();
+        }
+        notifyObservers(); // Notify observers of time update
+        switch (objectType) {
+            case "Segment":
+                
+                Segment segment = trainSystem.getSegmentByName(objectID);
+                if (segment != null) {
+                    switch (eventType) {
+                        case "Close":
+                            segment.close();
+                            break;
+                        case "Open":
+                            segment.open();
+                            break;
+                    }
                 }
-            }
-            break;
-        case "Train":
-            Train train = trainSystem.getTrainByName(objectID);
-            if (train != null) {
-                switch (eventType) {
-                    case "Start":
-                        train.start();
-                        break;
-                    case "Finish":
-                        train.finish();
-                        break;
-                    // Add other train event types here
+                break;
+            case "Train":
+                Train train = trainSystem.getTrainByName(objectID);
+                if (train != null) {
+                    switch (eventType) {
+                        case "Start":
+                            train.start();
+                            break;
+                        case "Finish":
+                            train.finish();
+                            break;
+                        case "Move":
+                            train.advance(currentTime);
+                            break;
+                        // Add other train event types here
+                    }
                 }
-            }
-            break;
-        case "Route":
-            Route route = trainSystem.getRouteByName(objectID);
-            if (route != null) {
-                switch (eventType) {
-                    case "Close":
-                        route.close();
-                        break;
-                    case "Open":
-                        route.open();
-                        break;
-                    // Add other route event types here
+                break;
+            case "Route":
+                Route route = trainSystem.getRouteByName(objectID);
+                if (route != null) {
+                    switch (eventType) {
+                        case "Close":
+                            route.close();
+                            break;
+                        case "Open":
+                            route.open();
+                            break;
+                        // Add other route event types here
+                    }
                 }
-            }
-            break;
-        case "Station":
-            Station station = trainSystem.getStationByName(objectID);
-            if (station != null) {
-                switch (eventType) {
-                    case "Close":
-                        station.close();
-                        break;
-                    case "Open":
-                        station.open();
-                        break;
-                    // Add other station event types here
+                break;
+            case "Station":
+                Station station = trainSystem.getStationByName(objectID);
+                if (station != null) {
+                    switch (eventType) {
+                        case "Close":
+                            station.close();
+                            break;
+                        case "Open":
+                            station.open();
+                            break;
+                        // Add other station event types here
+                    }
                 }
-            }
-            break;
-        // Add cases for other object types here
+                break;
+            // Add cases for other object types here
+        }
     }
-}
 
       // Method to register event listeners
     private void registerEventListeners() {
+        isRegistered = true;
         // Register segment listeners
         for (Segment segment : trainSystem.getSegments()) {
             segment.registerListener(new CFOSEventListenerImpl());
             segment.registerListener(new LightEventListenerImpl());
             segment.registerListener(new OccupiedEventListenerImpl());
+            registerObserver(segment);
+        }
+        for (Route route : trainSystem.getRoutes()) {
+            route.registerListener(new CFOSEventListenerImpl());
+            route.registerListener(new LightEventListenerImpl());
+            route.registerListener(new OccupiedEventListenerImpl());
+            registerObserver(route);
         }
 
         // Register train listeners
         for (Train train : trainSystem.getTrains()) {
             train.registerListener(new MoveEventListenerImpl(train.getRoute()));
+            registerObserver(train);
         }
 
         // Register station listeners (assuming stations are also objects that can have events)
         for (Station station : trainSystem.getStations()) {
             station.registerListener(new CFOSEventListenerImpl());
             station.registerListener(new LightEventListenerImpl());
+            registerObserver(station);
             // Add other station listeners if needed
         }
     }
 
     // Method to add events to the events log during parsing
-    private void addEventToLog(String eventType, String objectType, String objectID) {
-        eventsLog.add(Arrays.asList(eventType, objectType, objectID));
+    private void addEventToLog(String eventType, String objectType, String objectID, String time) {
+        eventsLog.add(Arrays.asList(eventType, objectType, objectID, time));
     }
-
-    private void initialise(String initialisationFile) throws FileNotFoundException {
-
+        /**
+     * Initialises the simulator based on the information provided in the specified file.
+     *
+     * @param  initialisationFile  the file containing the setup information
+     * @throws FileNotFoundException if the specified file is not found
+     */
+    public void initialise(String initialisationFile) throws FileNotFoundException {
 		if (status == SimulatorStatus.UNINITIALISED || status == SimulatorStatus.INITIALISED) {
-        getFileInfo(initialisationFile);
         File file = new File(initialisationFile);
+        //TODO: add current time in file to be
 			// create scanner to read from file
             try (Scanner scanner = new Scanner(file)) {
+                boolean isFirstLine = false;
+                String executionTime = "";
                 while (scanner.hasNextLine()) {
                     String line = scanner.nextLine().trim();
+                    // System.out.println(line);
+                    if (line.matches("\\d+") && !isFirstLine) { // Check if the line is an integer
+                        currentTime = Integer.parseInt(line); // Set the class variable currentTime
+                        isFirstLine = true;
+                        continue; // Skip to the next line
+                    }
+                    if (line.matches("\\d+")) { // Check if the line is an integer and executionTime is not yet found
+                        executionTime = line;
+                        continue;
+                    }
                     if (line.startsWith("Stations:")) {
                         int numberOfStations = Integer.parseInt(line.split(":")[1].trim());
                         for (int i = 0; i < numberOfStations; i++) {
                             line = scanner.nextLine().trim();
                             trainSystem.addStation(line);
                         }
+                        
                     } else if (line.startsWith("Segments:")) {
                         int numberOfSegments = Integer.parseInt(line.split(":")[1].trim());
                         for (int i = 0; i < numberOfSegments; i++) {
                             line = scanner.nextLine().trim();
                             String[] parts = line.split(":");
-                            System.out.println(Arrays.toString(parts));
                             String segmentName = parts[0].trim();
                             String stationA = parts[1].trim();
                             String stationB = parts[2].trim();
+                            // Validate the segment instance
                             trainSystem.addSegment(segmentName, stationA, stationB);
+                            Segment segment = trainSystem.getSegmentByName(segmentName);
+
+                            if ( !segment.verify() && !segment.validate()) {
+                                System.out.println("Error: Segment instance is not valid.");
+                                trainSystem.removeSegment(segmentName);
+                                continue;
+                            }
                         }
-                        LinkedList<Segment> segments = trainSystem.getSegments();
-            for (Segment segment : segments) {
-                System.out.println(segment.getName());
-            }
+
                     } else if (line.startsWith("Routes:")) {
                         int numberOfRoutes = Integer.parseInt(line.split(":")[1].trim());
                         for (int i = 0; i < numberOfRoutes; i++) {
                             line = scanner.nextLine().trim();
                             String[] parts = line.split(":");
-                            System.out.println(Arrays.toString(parts));
                             String routeName = parts[0].trim();
                             boolean isRoundTrip = Boolean.parseBoolean(parts[1].trim());
                             String[] segments = parts[2].trim().split(";");
@@ -216,19 +242,38 @@ private void executeEvent(String eventType, String objectType, String objectID, 
                                     routeSegments.add(segment);
                                 }
                             }
-                            trainSystem.addRoute(routeName, isRoundTrip, routeSegments);
+                            
+                        trainSystem.addRoute(routeName, isRoundTrip, routeSegments);
+                        Route route = trainSystem.getRouteByName(routeName);
+                        // get segments
+                        LinkedList<Segment> segments_ = trainSystem.getSegments();
+                        route.setSegments(segments_);
+                        route.getSegmentsForRoute();
+
+                            // Validate the train instance
+                            if (!route.validate() && !route.verify()) {
+                                System.out.println("Error: Route instance is not valid.");
+                                trainSystem.removeRoute(routeName);
+                                continue;
+                            }
                         }
                     } else if (line.startsWith("Trains:")) {
                         int numberOfTrains = Integer.parseInt(line.split(":")[1].trim());
                         for (int i = 0; i < numberOfTrains; i++) {
                             line = scanner.nextLine().trim();
                             String[] parts = line.split(":");
-                            System.out.println(Arrays.toString(parts));
                             String trainName = parts[0].trim();
 
                             // Add train
                             trainSystem.addTrain(trainName);
                             Train train = trainSystem.getTrainByName(trainName);
+                            
+                            // Validate the train instance
+                        if (!train.validate() && !train.verify()) {
+                            System.out.println("Error: Train instance is not valid.");
+                            trainSystem.removeTrain(trainName);
+                            continue;
+                        }
 
 
                             int startTime = Integer.parseInt(parts[1].trim());
@@ -245,9 +290,7 @@ private void executeEvent(String eventType, String objectType, String objectID, 
                                         train.addStop(stationName);
                                     }
                                 }
-        }
-                            
-                           
+                            }
                             train.register(startTime);
                             trainSystem.registerTrain(trainName, routeName);
                         }
@@ -256,12 +299,11 @@ private void executeEvent(String eventType, String objectType, String objectID, 
                         for (int i = 0; i < numberOfEvents; i++) {
                             line = scanner.nextLine().trim();
                             String[] parts = line.split(":");
-                            System.out.println(Arrays.toString(parts));
                             String eventType = parts[0].trim();
                             String objectType = parts[1].trim();
                             String objectID = parts[2].trim();
-                            addEventToLog(eventType, objectType, objectID);
-                            System.out.println(Arrays.toString(eventsLog.toArray()));
+                            // Add executionTime to the event before logging
+                            addEventToLog(eventType, objectType, objectID, executionTime);
                         }
                     }
                 }
@@ -284,16 +326,15 @@ private void executeEvent(String eventType, String objectType, String objectID, 
             String eventType = event_.get(0);
             String objectType = event_.get(1);
             String objectID = event_.get(2);
-            int currentTime = getCurrentTime(); // Assuming getCurrentTime() returns the current simulation time
-            
-            executeEvent(eventType, objectType, objectID, currentTime);
+            String currentTime = event_.get(3); // Assuming getCurrentTime() returns the current simulation time
+            int currentTimeInt = Integer.parseInt(currentTime);
+            System.out.println("This is the current time of the event: " + currentTimeInt);
+            System.out.println("This is the current time of the simulator: " + getCurrentTime());
+            if (currentTimeInt == getCurrentTime()) {
+                executeEvent(eventType, objectType, objectID, currentTime);
+            }
         }
     }
-    
-      
-
-    
-      
 
     private void initialiseFixed() {
 
@@ -428,7 +469,10 @@ private void executeEvent(String eventType, String objectType, String objectID, 
 
 		// otherwise do nothing as the simulation has started.
 	}
-
+        /**
+     * Sets the simulation status to INITIALISED.
+     *
+     */
     private void setInitialised() {
 		this.status = SimulatorStatus.INITIALISED;
 	}
@@ -467,7 +511,6 @@ private void executeEvent(String eventType, String objectType, String objectID, 
      */
     public void setCurrentTime(int currentTime) {
         this.currentTime = currentTime;
-        notifyObservers();
     }
 
     /**
@@ -480,24 +523,31 @@ private void executeEvent(String eventType, String objectType, String objectID, 
     }
 
     // Simulate the train system
-    public void simulate() {
-        while (!isFinished()) {
-            executeEvents();
-            LinkedList<Event> events = trainSystem.advance();
-            // Advance the train system and get events
-            currentTime++;
+    // Variable to keep track of the number of times executeEvents() function runs
 
-            for (Event event : events) {
-                addToLog(event);
-                // Add events to the log
-            }
-            // Increment current time
-            if (currentTime >= MAX_SIMULATION_TIME) {
-                status = SimulatorStatus.FINISHED;
-                // Set status to finished if maximum simulation time reached
-            }
+
+public void simulate() {
+    while (!isFinished()) {
+        currentTime++; // Increment current time
+        // Check if the eventEventsCounter is greater than or equal to the length of eventsLog
+        // if (eventEventsCounter < eventsLog.size()) {
+            executeEvents();
+        //     continue; // Stop calling executeEvents() if condition is met
+        // }
+
+
+        LinkedList<Event> events = trainSystem.advance(); // Advance the train system and get events
+
+        for (Event event : events) {
+            addToLog(event); // Add events to the log
+        }
+
+        if (currentTime >= MAX_SIMULATION_TIME) {
+            status = SimulatorStatus.FINISHED; // Set status to finished if maximum simulation time reached
         }
     }
+}
+
 
     /**
      * Validates the simulation according to custom validation logic.

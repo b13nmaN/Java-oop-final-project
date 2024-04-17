@@ -25,9 +25,13 @@ abstract public class Logable {
      * @param event The event to be added to the log.
      */
     public void addToLog(Event event) {
-        events.add(event);
-        // System.out.println("Added event: " + event);
+        // Check if the log already contains the event
+        if (!events.contains(event)) {
+            events.add(event);
+            // System.out.println("Added event: " + event);
+        } 
     }
+    
 
     /**
      * Retrieves the size of the log.
@@ -72,9 +76,23 @@ abstract public class Logable {
      * @return true if the log is valid, false otherwise.
      */
     public boolean validate() {
-        // TODO Implement validation logic
-        // Custom validation logic can be added here
-        return true;
+        boolean isValid = true;
+
+        // Check if events list is not null
+        if (events == null) {
+            System.out.println("Error: Events list cannot be null.");
+            isValid = false;
+        }
+
+        // Check if stringEvents list is not null
+        if (stringEvents == null) {
+            System.out.println("Error: String events list cannot be null.");
+            isValid = false;
+        }
+
+        // Add more validation rules here if needed
+
+        return isValid;
     }
 
     public List<Event> getEventsAsTypeEvent() {

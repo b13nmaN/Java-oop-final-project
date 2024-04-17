@@ -248,7 +248,10 @@ public class Train extends Logable implements Verifiable, EventListenerManager, 
 
         CFOSEvent event = new CFOSEvent(name, startTime, Action.FINISH);
         currentStation = route.getEnd(); // Move the train to the end station
+        deregister();
         addToLog(event);
+
+        notifyListeners(event);
 
         return event;
     }
@@ -276,7 +279,7 @@ public class Train extends Logable implements Verifiable, EventListenerManager, 
         }
     
         // Check if the current station is in the stops list
-        if (stops.contains(currentStation)) {
+        if (stops.contains(currentStation.getName())) {
             // Move event when the train stops at a stop station
             MoveEvent stopEvent = new MoveEvent(name, time, sourceStation, destinationStation);
             addToLog(stopEvent);
@@ -344,13 +347,43 @@ public class Train extends Logable implements Verifiable, EventListenerManager, 
         return route != null && route.verify() && timeRegistered > 0;
     }
 
+        /**
+     * Returns the number of stops in the train's route.
+     *
+     * @return the number of stops in the train's route
+     */
+    public int size() {
+        return stops.size();
+    }
+
     /**
      * Validates the train.
      * @return True if the train is valid, false otherwise.
      */
     public boolean validate() {
-        // Implement validation logic
-        return true; // Placeholder, implement your validation logic
+        boolean isValid = true;
+
+        // Check if id is positive
+        if (id <= 0) {
+            System.out.println("Error: Train ID must be a positive integer.");
+            isValid = false;
+        }
+
+        // Check if name is not null or empty
+        if (name == null || name.isEmpty()) {
+            System.out.println("Error: Train name cannot be null or empty.");
+            isValid = false;
+        }
+
+        // Check if stops list is not null
+        if (stops == null) {
+            System.out.println("Error: Stops list cannot be null.");
+            isValid = false;
+        }
+
+        // Add more validation rules here if needed
+
+        return isValid;
     }
 
     // @Override

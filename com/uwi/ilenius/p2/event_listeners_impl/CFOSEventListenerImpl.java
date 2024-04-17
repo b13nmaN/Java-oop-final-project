@@ -9,6 +9,10 @@ import com.uwi.ilenius.p2.events.CFOSEvent;
  */
 public class CFOSEventListenerImpl implements CFOSEventListener, EventListener {
 
+    public CFOSEventListenerImpl() {
+        
+    }
+
     /**
      * Handles CFOSEvent occurrences.
      *
